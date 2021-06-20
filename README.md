@@ -1,13 +1,13 @@
 # videoanalytics
 
-Python library for prototyping of video analytic applications. Relies on OpenCV, Keras, and other standard AI python packages.
+Python library for prototyping of video analytic applications. Relies on OpenCV, Keras, and other standard computer vision and machine learning python packages.
 
 References:
 - Code for YOLOv4 and DeepSORT was adapted from [yolov4-deepsort](https://github.com/theAIGuysCode/yolov4-deepsort).
 
 ## Instructions for developers
 
-Import conda environment:
+Import conda environment (GPU):
 
 ~~~bash
 conda env create -f videoanalytics-gpu.yml
@@ -61,7 +61,7 @@ Exporting requirements for pip package:
 pip freeze > requirements.txt
 ~~~
 
-## Generate documentation (Sphinx)
+Generate documentation (Sphinx)
 
 ~~~bash
 make
