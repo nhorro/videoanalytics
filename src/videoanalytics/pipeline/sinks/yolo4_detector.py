@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sinks.yolo4_detector
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+YOLOv4 object detector tensorflow implementation.
+
+"""
+
 import tensorflow as tf
 import cv2
 from tensorflow.python.saved_model import tag_constants

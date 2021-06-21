@@ -1,5 +1,17 @@
-# Use with docker run -it --rm --name videoservice --network="host" nhorro/mpeg-streamer-service
-# http://localhost:5000/video_feed
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sinks.zmqpub
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Publish a frame in ZMQ. This componente is meant to be used with 
+`nhorro/mpeg-streamer-service docker image <https://hub.docker.com/r/nhorro/mpeg-streamer-service/>`.
+
+.. code-block:: console
+    
+    docker run -it --rm --name videoservice --network="host" nhorro/mpeg-streamer-service http://localhost:5000/video_feed
+"""
+
 import cv2
 import numpy as np
 import zmq

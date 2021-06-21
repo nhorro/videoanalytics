@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sinks.obj_detector
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Implementation-independent object detection related components.
+
+"""
+
 from videoanalytics.utils import read_class_names
 import colorsys
 import random

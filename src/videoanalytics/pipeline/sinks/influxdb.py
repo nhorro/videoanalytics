@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sinks.influxdb
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+InfluxDB output.
+"""
+
 import numpy as np
 import cv2
 from influxdb import InfluxDBClient

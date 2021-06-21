@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Built-in sources.
+"""
+
 import os
 import cv2
 import numpy as np

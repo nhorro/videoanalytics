@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sinks.trackers.sort
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Implementation of SORT tracking algorithm.
+"""
+
 import numpy as np
 import pandas as pd
 import cv2

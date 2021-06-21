@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sinks.roi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Loading and processing of polygonal regions of interest (ROIs).
+
+"""
+
 import colorsys
 import random
 import cv2

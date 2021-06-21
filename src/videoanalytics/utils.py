@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.utils
+~~~~~~~~~~~~~~~~~~~~
+
+Miscelaneous functions for conversion of types and adapting format
+of data shared by more than one component.
+"""
+
 def read_class_names(filename):
     names = {}
     with open(filename, 'r') as data:
@@ -5,8 +15,9 @@ def read_class_names(filename):
             names[ID] = name.strip('\n')
     return names
 
-# helper function to convert bounding boxes from normalized ymin, xmin, ymax, xmax ---> xmin, ymin, xmax, ymax
 def format_boxes(bboxes, image_height, image_width):
+    """# helper function to convert bounding boxes from normalized ymin, xmin, ymax, xmax ---> xmin, ymin, xmax, ymax
+    """
     for box in bboxes:
         ymin = int(box[0] * image_height)
         xmin = int(box[1] * image_width)

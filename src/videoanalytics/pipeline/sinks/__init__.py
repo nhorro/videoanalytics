@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sinks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Built-in sinks.
+"""
+
 import cv2
 import numpy as np
 

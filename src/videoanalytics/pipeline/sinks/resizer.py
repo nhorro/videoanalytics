@@ -1,5 +1,13 @@
-# Use with docker run -it --rm --name videoservice --network="host" nhorro/mpeg-streamer-service
-# http://localhost:5000/video_feed
+# -*- coding: utf-8 -*-
+
+"""
+videoanalytics.pipeline.sinks.resizer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Resize a frame.
+
+"""
+
 import cv2
 import numpy as np
 import zmq
