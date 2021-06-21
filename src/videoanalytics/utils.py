@@ -4,11 +4,19 @@
 videoanalytics.utils
 ~~~~~~~~~~~~~~~~~~~~
 
-Miscelaneous functions for conversion of types and adapting format
+This module contains miscelaneous functions for conversion of types and adapting format
 of data shared by more than one component.
 """
 
 def read_class_names(filename):
+    '''Reads a textfile containing classes names in DarkNet format.
+        
+        Args:
+            filename (str): text file. See examples.
+
+        Returns:
+            names (dict): A dictionary that maps each class name with an id.
+        '''
     names = {}
     with open(filename, 'r') as data:
         for ID, name in enumerate(data):
@@ -16,8 +24,16 @@ def read_class_names(filename):
     return names
 
 def format_boxes(bboxes, image_height, image_width):
-    """# helper function to convert bounding boxes from normalized ymin, xmin, ymax, xmax ---> xmin, ymin, xmax, ymax
-    """
+    '''Helper function to convert bounding boxes from normalized ymin, xmin, ymax, xmax to frame coordinates: xmin, ymin, xmax, ymax
+        
+        Args:
+            bboxes (np.array): Array containing multiple bounding boxes.
+            image_height (int): height of the image in pixels.
+            image_width (int): width of the image in pixels.
+
+        Returns:
+            bboxes (np.array): converted bounding boxes.
+        '''    
     for box in bboxes:
         ymin = int(box[0] * image_height)
         xmin = int(box[1] * image_width)

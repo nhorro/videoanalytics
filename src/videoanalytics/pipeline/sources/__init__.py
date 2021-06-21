@@ -4,7 +4,7 @@
 videoanalytics.pipeline.sources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Built-in sources.
+This module contains the core components for video input.
 """
 
 import os
@@ -15,6 +15,38 @@ from tqdm import tqdm
 from videoanalytics.pipeline import Source
 
 class VideoReader(Source):
+    '''
+    Reads video from a file using OpenCV capture device interface.
+
+    This component **WRITES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | INPUT_FPS         | Input video FPS.                                    |
+    +-------------------+-----------------------------------------------------+
+    | INPUT_WIDTH       | Input video width in pixels.                        |
+    +-------------------+-----------------------------------------------------+
+    | INPUT_HEIGHT      | Input video height in pixels.                       |
+    +-------------------+-----------------------------------------------------+
+    | START_FRAME       | Input video start frame.                            |
+    +-------------------+-----------------------------------------------------+
+    | TOTAL_FRAMES      | Input video width in pixels.                        |
+    +-------------------+-----------------------------------------------------+
+    | STEP_FRAMES       | Input video width in pixels.                        |
+    +-------------------+-----------------------------------------------------+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+
+    Args:
+        context (dict): The global context. 
+        video_path (str): input video filename.
+        start_frame(int): start frame (default is 0).
+        max_frames(int): maximum number of frames to read (default is 1).
+        step_frames(int): default is 1, use other values to drop frames. 
+                          This option is used for pipelines that can not cope with 
+                          a high framerate.
+    '''
     def __init__(self, context,video_path,
                  start_frame=0,max_frames=None,step_frames=None):
         super().__init__(context)
@@ -32,10 +64,7 @@ class VideoReader(Source):
         if self.total_frames>(video_frame_count-self.start_frame):
             self.total_frames=video_frame_count-self.start_frame
         
-        if step_frames is None:
-            self.step_frames = 1
-        else:
-            self.step_frames = step_frames
+        self.step_frames = step_frames
 
         self.context["INPUT_FPS"] = int(self.cap.get(cv2.CAP_PROP_FPS))
         self.context["INPUT_WIDTH"] = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -58,8 +87,7 @@ class VideoReader(Source):
         #print("Setting up VideoReader")
         pass
     
-    def read(self):
-        
+    def read(self):        
         if self.processed_frames < self.total_frames:
             if self.processed_frames % self.step_frames == 0:
                 ret, frame = self.cap.read()
@@ -76,7 +104,7 @@ class VideoReader(Source):
                 #
             self.context['FRAME'] = frame
                 
-            update_every=int(os.getenv('UPDATE_PROGRESS_NFRAMES',self.step_frames))
+            update_every=self.step_frames
             if (self.processed_frames -1) % update_every == 0:
                 self.progress_bar.update(update_every)
                 

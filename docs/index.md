@@ -1,3 +1,3 @@
 # videoanalytics
 
-Home page for videoanalytics library.
+Home page for videoanalytics library. WIP.
