@@ -91,6 +91,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The pipeline paradigm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#component-organisation">Component organisation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-videoanalytics.pipeline">API reference</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#videoanalytics-pipeline">videoanalytics.pipeline</a></li>
 </ul>
@@ -101,7 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sinks.html">Sinks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="object_detection.html">Object detection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="object_tracking.html">Object tracking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="roi.html">ROIs (regions of interest)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a></li>
@@ -175,7 +176,7 @@
             
   <div class="section" id="the-pipeline-paradigm">
 <h1>The pipeline paradigm<a class="headerlink" href="#the-pipeline-paradigm" title="Permalink to this headline">¶</a></h1>
-<p>This module contains the building blocks for implementing the pipeline paradigm.
+<p>The pipeline module contains the building blocks for implementing the pipeline paradigm.
 This implementation defines two concepts:</p>
 <blockquote>
 <div><ul class="simple">
@@ -188,7 +189,50 @@ Each pipeline is composed of <strong>only one source</strong> of information and
 perform operations.</p>
 <p>Pipelines are not restricted to video frames, but to keep things simple we will be assuming that
 each unit of information is a video frame.</p>
-<img alt="Simplified package diagram" src="_images/package.png" />
+<p><a class="reference internal" href="#fig-pipeline"><span class="std std-numref">Fig. 1</span></a> shows the executed model for an example pipeline that tracks objects and
+performs some kind of activity classification based on their trajectories.</p>
+<div class="align-center figure" id="id1">
+<span id="fig-pipeline"></span><img alt="_images/pipeline.png" src="_images/pipeline.png" />
+<p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">Example of a pipeline. Dashed arrows indicate dependencies and solid arrows indicate read
+and write access to the shared context.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>Notice that the pipeline is defined as a <cite>directed acyclic graph &lt;https://en.wikipedia.org/wiki/Directed_acyclic_graph/&gt;</cite> but it is executed in a
+sequential order one component at a time. The sequence to grant that dependencies are met is obtained using the
+<cite>topological sorting &lt;https://en.wikipedia.org/wiki/Topological_sorting/&gt;</cite> algorithm.</p>
+<p>Another aspect to consider is that there is no direct communication between components, as data is shared
+through a <em>global context</em> that is passed by reference to each component during initialization.</p>
+<p>This decision is inspired in the <cite>blackboard design pattern &lt;https://en.wikipedia.org/wiki/Blackboard_(design_pattern)/&gt;</cite>
+as it reduces the complexity of defining specific interfaces. Also, all data is shared in standard python
+and scipy data types such as dictionaries and numpy arrays.
+Each component declares in its API which variables it needs and which variables it creates and/or updates.
+Note that while this might be convenient for prototyping, it might not be an optimal solution for
+a production pipeline.</p>
+<p>Together with model performance evaluation, processing time and CPU and resource consumption are
+relevant for the selection of a suitable algorithm.</p>
+<p>The execution of a pipeline automatically measures the initial and end time for each iteration and stores
+some statistics such as best and worst cases, and average processing time. Callbacks are provided for
+more specific metrics such as memory consumption, that heavily depend on the underlying implementation of
+each component.</p>
+<div class="section" id="component-organisation">
+<h2>Component organisation<a class="headerlink" href="#component-organisation" title="Permalink to this headline">¶</a></h2>
+<p>The library proposes the division of components in the aforementioned categories: sources and sinks.
+These categories can then be furtherly grouped in components for more specific tasks or domains:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Background substraction an motion estimation.</p></li>
+<li><p>Object detection.</p></li>
+<li><p>Object tracking.</p></li>
+<li><p>Visualization/anotation.</p></li>
+<li><p>Domain/application-specific.</p></li>
+</ul>
+</div></blockquote>
+<p>Thus, the different components inherit the core Source and Sink abstract classes in the pipeline
+module and are mantained in children modules as indicated in <a class="reference internal" href="#fig-package"><span class="std std-numref">Fig. 2</span></a>.</p>
+<div class="align-center figure align-default" id="id2">
+<span id="fig-package"></span><img alt="_images/package.png" src="_images/package.png" />
+<p class="caption"><span class="caption-number">Fig. 2 </span><span class="caption-text">Example of module organisation</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+</div>
 <div class="section" id="module-videoanalytics.pipeline">
 <span id="api-reference"></span><h2>API reference<a class="headerlink" href="#module-videoanalytics.pipeline" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="videoanalytics-pipeline">

@@ -1,5 +1,5 @@
-ROIs (regions of interest)
-==========================
+Working with ROIs
+=================
 
 Regions of interest are polygonal areas which can be tested for the presence of objects or other events
 such as:
