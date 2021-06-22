@@ -1,0 +1,34 @@
+@startuml
+package pipeline {
+  abstract Source {
+    setup()
+    read()
+    shutdown()
+  }
+  abstract Sink {
+    setup()
+    process()
+    shutdown()
+  }
+}
+
+package sources {
+  Source <|- VideoReader
+  Source <|- CameraReader
+}
+
+package sinks {
+
+  package object_detection {
+     Sink <|- YOLO4ObjectDetector
+     Sink <|- ObjectAnnotator
+  }
+
+  package database {
+  }
+
+  package object_tracking {
+  }
+
+}
+@enduml

@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-videoanalytics.pipeline.sinks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Built-in sinks.
+This module contains the Built-in sinks.
 """
 
 import cv2
@@ -13,6 +10,29 @@ import numpy as np
 from videoanalytics.pipeline import Sink
 
 class VideoWriter(Sink):
+    '''
+    Writes video to a file using OpenCV writer.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | INPUT_FPS         | Input video FPS.                                    |
+    +-------------------+-----------------------------------------------------+
+    | INPUT_WIDTH       | Input video width in pixels.                        |
+    +-------------------+-----------------------------------------------------+
+    | INPUT_HEIGHT      | Input video height in pixels.                       |
+    +-------------------+-----------------------------------------------------+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+
+    Args:
+        context (dict): The global context. 
+        filename (str): output video filename.
+        output_format (str): output format (default to XVID). 
+                             Any format supported by OpenCV VideoWriter_fourcc.        
+    '''
     def __init__(self, context,filename,output_format="XVID"):
         super().__init__(context)
         self.filename = filename

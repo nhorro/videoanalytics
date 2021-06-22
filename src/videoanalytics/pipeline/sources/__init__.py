@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """
-videoanalytics.pipeline.sources
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 This module contains the core components for video input.
 """
 
