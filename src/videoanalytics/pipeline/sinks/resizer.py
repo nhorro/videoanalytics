@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-videoanalytics.pipeline.sinks.resizer
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Resize a frame.
-
 """
 
 import cv2

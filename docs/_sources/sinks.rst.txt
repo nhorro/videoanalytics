@@ -10,8 +10,8 @@ Design guidelines for sinks
 It is recommeded that sinks perform a specific task and relegate complex tasks to composition
 of several sinks in pipeline definition.
 
-Reference for sink components
------------------------------
+API reference
+-------------
 
 .. automodule:: videoanalytics.pipeline.sinks
    :members:

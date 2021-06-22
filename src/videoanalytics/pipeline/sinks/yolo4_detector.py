@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-videoanalytics.pipeline.sinks.yolo4_detector
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 YOLOv4 object detector tensorflow implementation.
-
 """
 
 import tensorflow as tf

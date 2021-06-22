@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """
-videoanalytics.pipeline.sinks.influxdb
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 InfluxDB output.
 """
 
