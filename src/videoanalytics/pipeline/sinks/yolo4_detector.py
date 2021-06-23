@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-YOLOv4 object detector tensorflow implementation.
+This module contains a YOLOv4 object detector tensorflow implementation.
 """
 
 import tensorflow as tf
@@ -13,14 +13,46 @@ from videoanalytics.pipeline import Sink
 import numpy as np
 
 class YOLOv4Detector(Sink):
-    def __init__(self, context,weights_filename,
+    '''
+    YOLOv4 object detector tensorflow implementation.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+
+    This component **UPDATES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | DETECTIONS        | List holding numpy array with bounding boxes.       |
+    +-------------------+-----------------------------------------------------+
+
+    Args:
+        name(str): the component unique name.
+        context (dict): The global context.         
+        weights_filename (str): model weights filename. 
+        allowed_classes (list): set of allowed classes. This option is to restrict
+                                the detections to a subset of classes relevant to
+                                the application domain.
+        yolo_input_size (int): size in pixels of the input cell.
+        yolo_max_output_size_per_class (int): maximum number of detections per class.
+        yolo_max_total_size (int): maximum number of detections.
+        yolo_iou_threshold (float): minimum IoU to accept detection.
+        yolo_score_threshold (float): minimum score to accept detected class as valid.
+    '''
+    def __init__(self,name,context,weights_filename,
                  allowed_classes = [0],
                  yolo_input_size = 416,
                  yolo_max_output_size_per_class=50,
                  yolo_max_total_size=50,
                  yolo_iou_threshold=0.45,
                  yolo_score_threshold=0.40):
-        super().__init__(context)
+        super().__init__(name, context)
         
         self.allowed_classes = np.array(allowed_classes)
         

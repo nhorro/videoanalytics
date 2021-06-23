@@ -3,6 +3,7 @@
 """
 This module contains the Built-in sinks.
 """
+import logging
 
 import cv2
 import numpy as np
@@ -28,13 +29,17 @@ class VideoWriter(Sink):
     +-------------------+-----------------------------------------------------+
 
     Args:
-        context (dict): The global context. 
+        name(str): the component unique name.
+        context (dict): The global context.         
         filename (str): output video filename.
         output_format (str): output format (default to XVID). 
                              Any format supported by OpenCV VideoWriter_fourcc.        
     '''
-    def __init__(self, context,filename,output_format="XVID"):
-        super().__init__(context)
+    
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, name, context, filename,output_format="XVID"):
+        super().__init__(name,context)
         self.filename = filename
         codec = cv2.VideoWriter_fourcc(*output_format)
         fps = self.context["INPUT_FPS"]
@@ -50,5 +55,6 @@ class VideoWriter(Sink):
         self.out.write( converted )
     
     def shutdown(self):
-        print("Shutting down VideoWriter. Video saved to %s" % self.filename )
+        self.logger.info("Shutting down VideoWriter. Video saved to %s" % self.filename )
         self.out.release()   
+

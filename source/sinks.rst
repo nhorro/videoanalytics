@@ -7,8 +7,8 @@ such as publishing or storing it in a database.
 Design guidelines for sinks
 ---------------------------
 
-It is recommeded that sinks perform a specific task and relegate complex tasks to composition
-of several sinks in pipeline definition.
+It is recommeded that sinks perform a single specific task and complex actions are achieved
+by interaction of several sinks specified at configuration time rather than a monolithic approach.
 
 API reference
 -------------

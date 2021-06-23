@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """
-videoanalytics.utils
-~~~~~~~~~~~~~~~~~~~~
-
 This module contains miscelaneous functions for conversion of types and adapting format
 of data shared by more than one component.
 """

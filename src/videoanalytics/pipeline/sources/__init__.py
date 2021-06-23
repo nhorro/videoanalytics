@@ -5,13 +5,18 @@ This module contains the core components for video input.
 """
 
 import os
+import logging
+
 import cv2
 import numpy as np
+
 from tqdm import tqdm
 
 from videoanalytics.pipeline import Source
 
 class VideoReader(Source):
+    logger = logging.getLogger(__name__)
+
     '''
     Reads video from a file using OpenCV capture device interface.
 
@@ -35,7 +40,8 @@ class VideoReader(Source):
     | FRAME             | Numpy array representing the frame.                 |
     +-------------------+-----------------------------------------------------+
 
-    Args:
+    Args:        
+        name(str): the component unique name.
         context (dict): The global context. 
         video_path (str): input video filename.
         start_frame(int): start frame (default is 0).
@@ -44,9 +50,9 @@ class VideoReader(Source):
                           This option is used for pipelines that can not cope with 
                           a high framerate.
     '''
-    def __init__(self, context,video_path,
-                 start_frame=0,max_frames=None,step_frames=None):
-        super().__init__(context)
+    def __init__(self, name, context, video_path:str,
+                 start_frame=0,max_frames=None,step_frames=1):
+        super().__init__(name,context)
         self.processed_frames = 0
         self.cap = cv2.VideoCapture(video_path)
         
@@ -76,12 +82,11 @@ class VideoReader(Source):
             _ , _ = self.cap.read()
             self.skip_frames += 1
         
-        print("Start frame:", self.start_frame)
-        print("Total frames frame:", self.total_frames)
-        print("Skipped frames :", self.skip_frames)
+        self.logger.info("Start frame:", self.start_frame)
+        self.logger.info("Total frames frame:", self.total_frames)
+        self.logger.info("Skipped frames :", self.skip_frames)
    
     def setup(self):
-        #print("Setting up VideoReader")
         pass
     
     def read(self):        
@@ -103,12 +108,11 @@ class VideoReader(Source):
                 
             update_every=self.step_frames
             if (self.processed_frames -1) % update_every == 0:
-                self.progress_bar.update(update_every)
-                
+                self.progress_bar.update(update_every)                
         else:
             ret = False
         return ret
     
     def shutdown(self):
-        #print("Shutting down VideoReader")
+        self.logger.info("Shutting down VideoReader")
         self.cap.release()

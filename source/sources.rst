@@ -9,7 +9,7 @@ buffers or other signal types.
 Design guidelines for sources
 -----------------------------
 
-Sources should contemplate a method of guaranteeing an ouptut rate that the processing pipeline
+Sources should contemplate a method of guaranteeing an output rate that the processing pipeline
 can cope with, being the most naive implementation providing an attribute to drop frames or
 reduce frame quality.
 

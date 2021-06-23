@@ -26,14 +26,14 @@ performs some kind of activity classification based on their trajectories.
     Example of a pipeline. Dashed arrows indicate dependencies and solid arrows indicate read 
     and write access to the shared context.
 
-Notice that the pipeline is defined as a `directed acyclic graph <https://en.wikipedia.org/wiki/Directed_acyclic_graph/>` but it is executed in a 
+Notice that the pipeline is defined as a `directed acyclic graph <https://en.wikipedia.org/wiki/Directed_acyclic_graph/>`_ but it is executed in a 
 sequential order one component at a time. The sequence to grant that dependencies are met is obtained using the 
-`topological sorting <https://en.wikipedia.org/wiki/Topological_sorting/>` algorithm.
+`topological sorting <https://en.wikipedia.org/wiki/Topological_sorting/>`_ algorithm.
 
 Another aspect to consider is that there is no direct communication between components, as data is shared
 through a *global context* that is passed by reference to each component during initialization.
 
-This decision is inspired in the `blackboard design pattern <https://en.wikipedia.org/wiki/Blackboard_(design_pattern)/>`
+This decision is inspired in the `blackboard design pattern <https://en.wikipedia.org/wiki/Blackboard_(design_pattern)/>`_
 as it reduces the complexity of defining specific interfaces. Also, all data is shared in standard python
 and scipy data types such as dictionaries and numpy arrays. 
 Each component declares in its API which variables it needs and which variables it creates and/or updates.
