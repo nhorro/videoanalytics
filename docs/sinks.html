@@ -99,7 +99,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="object_detection.html">Object detection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="object_tracking.html">Object tracking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="roi.html">ROIs (regions of interest)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a></li>
@@ -177,15 +177,15 @@
 such as publishing or storing it in a database.</p>
 <div class="section" id="design-guidelines-for-sinks">
 <h2>Design guidelines for sinks<a class="headerlink" href="#design-guidelines-for-sinks" title="Permalink to this headline">¶</a></h2>
-<p>It is recommeded that sinks perform a specific task and relegate complex tasks to composition
-of several sinks in pipeline definition.</p>
+<p>It is recommeded that sinks perform a single specific task and complex actions are achieved
+by interaction of several sinks specified at configuration time rather than a monolithic approach.</p>
 </div>
 <div class="section" id="module-videoanalytics.pipeline.sinks">
 <span id="api-reference"></span><h2>API reference<a class="headerlink" href="#module-videoanalytics.pipeline.sinks" title="Permalink to this headline">¶</a></h2>
 <p>This module contains the Built-in sinks.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.VideoWriter">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.</span></span><span class="sig-name descname"><span class="pre">VideoWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XVID'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.VideoWriter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.</span></span><span class="sig-name descname"><span class="pre">VideoWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XVID'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.VideoWriter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes video to a file using OpenCV writer.</p>
 <p>This component <strong>READS</strong> the following entries in the global context:</p>
 <table class="docutils align-default">
@@ -218,6 +218,7 @@ of several sinks in pipeline definition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
 <li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
 <li><p><strong>filename</strong> (<em>str</em>) – output video filename.</p></li>
 <li><p><strong>output_format</strong> (<em>str</em>) – output format (default to XVID).

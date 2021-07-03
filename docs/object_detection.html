@@ -94,12 +94,11 @@
 <li class="toctree-l1"><a class="reference internal" href="sources.html">Sources</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sinks.html">Sinks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Object detection</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#reference-for-components-for-object-detection">Reference for components for object detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.obj_detector">API reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="object_tracking.html">Object tracking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="roi.html">ROIs (regions of interest)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a></li>
@@ -174,8 +173,6 @@
   <div class="section" id="object-detection">
 <h1>Object detection<a class="headerlink" href="#object-detection" title="Permalink to this headline">¶</a></h1>
 <p>This sections describes the components used for object detection.</p>
-<div class="section" id="reference-for-components-for-object-detection">
-<h2>Reference for components for object detection<a class="headerlink" href="#reference-for-components-for-object-detection" title="Permalink to this headline">¶</a></h2>
 <p>Object detection components that are independent of the implementation are
 separated from specific models.
 Examples of the first category include visual annotators, components to save detections
@@ -184,7 +181,6 @@ Examples of specific implementation are a tensorflow, OpenCV or other deep learn
 port of the Darknet YOLOv4 model or any of its variants.
 The consumption or object detection as a service through gRPC or other protocol is also an
 implementation alternative, that could reduce the dependencies for videoanalytics library.</p>
-</div>
 <div class="section" id="module-videoanalytics.pipeline.sinks.obj_detector">
 <span id="api-reference"></span><h2>API reference<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.obj_detector" title="Permalink to this headline">¶</a></h2>
 <p>Implementation-independent object detection related components.</p>
@@ -257,11 +253,67 @@ implementation alternative, that could reduce the dependencies for videoanalytic
 
 </dd></dl>
 
-<span class="target" id="module-videoanalytics.pipeline.sinks.yolo4_detector"></span><p>YOLOv4 object detector tensorflow implementation.</p>
+<span class="target" id="module-videoanalytics.pipeline.sinks.yolo4_detector"></span><p>This module contains a YOLOv4 object detector tensorflow implementation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.yolo4_detector.</span></span><span class="sig-name descname"><span class="pre">YOLOv4Detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_input_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">416</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_max_output_size_per_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_max_total_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_score_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.yolo4_detector.</span></span><span class="sig-name descname"><span class="pre">YOLOv4Detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_input_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">416</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_max_output_size_per_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_max_total_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_score_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector" title="Permalink to this definition">¶</a></dt>
+<dd><p>YOLOv4 object detector tensorflow implementation.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>UPDATES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DETECTIONS</p></td>
+<td colspan="3"><p>List holding numpy array with bounding boxes.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>weights_filename</strong> (<em>str</em>) – model weights filename.</p></li>
+<li><p><strong>allowed_classes</strong> (<em>list</em>) – set of allowed classes. This option is to restrict
+the detections to a subset of classes relevant to
+the application domain.</p></li>
+<li><p><strong>yolo_input_size</strong> (<em>int</em>) – size in pixels of the input cell.</p></li>
+<li><p><strong>yolo_max_output_size_per_class</strong> (<em>int</em>) – maximum number of detections per class.</p></li>
+<li><p><strong>yolo_max_total_size</strong> (<em>int</em>) – maximum number of detections.</p></li>
+<li><p><strong>yolo_iou_threshold</strong> (<em>float</em>) – minimum IoU to accept detection.</p></li>
+<li><p><strong>yolo_score_threshold</strong> (<em>float</em>) – minimum score to accept detected class as valid.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector.process">
 <span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method is called for each active component in the pipeline.</p>

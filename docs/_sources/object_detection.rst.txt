@@ -3,10 +3,6 @@ Object detection
 
 This sections describes the components used for object detection. 
 
-
-Reference for components for object detection
----------------------------------------------
-
 Object detection components that are independent of the implementation are
 separated from specific models.
 Examples of the first category include visual annotators, components to save detections

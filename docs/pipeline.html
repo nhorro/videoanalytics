@@ -92,10 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The pipeline paradigm</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#component-organisation">Component organisation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-videoanalytics.pipeline">API reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#videoanalytics-pipeline">videoanalytics.pipeline</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-videoanalytics.pipeline">API reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sources.html">Sources</a></li>
@@ -196,12 +193,12 @@ performs some kind of activity classification based on their trajectories.</p>
 <p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">Example of a pipeline. Dashed arrows indicate dependencies and solid arrows indicate read
 and write access to the shared context.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
-<p>Notice that the pipeline is defined as a <cite>directed acyclic graph &lt;https://en.wikipedia.org/wiki/Directed_acyclic_graph/&gt;</cite> but it is executed in a
+<p>Notice that the pipeline is defined as a <a class="reference external" href="https://en.wikipedia.org/wiki/Directed_acyclic_graph/">directed acyclic graph</a> but it is executed in a
 sequential order one component at a time. The sequence to grant that dependencies are met is obtained using the
-<cite>topological sorting &lt;https://en.wikipedia.org/wiki/Topological_sorting/&gt;</cite> algorithm.</p>
+<a class="reference external" href="https://en.wikipedia.org/wiki/Topological_sorting/">topological sorting</a> algorithm.</p>
 <p>Another aspect to consider is that there is no direct communication between components, as data is shared
 through a <em>global context</em> that is passed by reference to each component during initialization.</p>
-<p>This decision is inspired in the <cite>blackboard design pattern &lt;https://en.wikipedia.org/wiki/Blackboard_(design_pattern)/&gt;</cite>
+<p>This decision is inspired in the <a class="reference external" href="https://en.wikipedia.org/wiki/Blackboard_(design_pattern)/">blackboard design pattern</a>
 as it reduces the complexity of defining specific interfaces. Also, all data is shared in standard python
 and scipy data types such as dictionaries and numpy arrays.
 Each component declares in its API which variables it needs and which variables it creates and/or updates.
@@ -235,16 +232,13 @@ module and are mantained in children modules as indicated in <a class="reference
 </div>
 <div class="section" id="module-videoanalytics.pipeline">
 <span id="api-reference"></span><h2>API reference<a class="headerlink" href="#module-videoanalytics.pipeline" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="videoanalytics-pipeline">
-<h3>videoanalytics.pipeline<a class="headerlink" href="#videoanalytics-pipeline" title="Permalink to this headline">¶</a></h3>
 <p>Base classes for the pipeline paradigm.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.Sink">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.</span></span><span class="sig-name descname"><span class="pre">Sink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Sink" title="Permalink to this definition">¶</a></dt>
-<dd><p>A sink.</p>
-<dl class="py method">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.</span></span><span class="sig-name descname"><span class="pre">Sink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Sink" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.Sink.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Sink.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Sink.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default constructor.</p>
 </dd></dl>
 
@@ -252,6 +246,12 @@ module and are mantained in children modules as indicated in <a class="reference
 <dt class="sig sig-object py" id="videoanalytics.pipeline.Sink.enable_display">
 <span class="sig-name descname"><span class="pre">enable_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Sink.enable_display" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set/unset display output (does not necesarily apply to all components).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.Sink.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">''</span></em><a class="headerlink" href="#videoanalytics.pipeline.Sink.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A sink.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -282,12 +282,17 @@ module and are mantained in children modules as indicated in <a class="reference
 
 <dl class="py class">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.Source">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.</span></span><span class="sig-name descname"><span class="pre">Source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Source" title="Permalink to this definition">¶</a></dt>
-<dd><p>A source.</p>
-<dl class="py method">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.</span></span><span class="sig-name descname"><span class="pre">Source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Source" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.Source.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Source.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.Source.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default constructor.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.Source.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"> <span class="pre">=</span> <span class="pre">''</span></em><a class="headerlink" href="#videoanalytics.pipeline.Source.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A source.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -310,14 +315,6 @@ module and are mantained in children modules as indicated in <a class="reference
 
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.process_pipeline">
-<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.</span></span><span class="sig-name descname"><span class="pre">process_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.process_pipeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute a pipeline.
-The order of traversal of the components is computed using topological sort.</p>
-</dd></dl>
-
-</div>
 </div>
 </div>
 

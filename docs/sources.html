@@ -99,7 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sinks.html">Sinks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="object_detection.html">Object detection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="object_tracking.html">Object tracking</a></li>
-<li class="toctree-l1"><a class="reference internal" href="roi.html">ROIs (regions of interest)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a></li>
@@ -179,7 +179,7 @@ Currently, only video frames are supported but the concept could be extended to 
 buffers or other signal types.</p>
 <div class="section" id="design-guidelines-for-sources">
 <h2>Design guidelines for sources<a class="headerlink" href="#design-guidelines-for-sources" title="Permalink to this headline">¶</a></h2>
-<p>Sources should contemplate a method of guaranteeing an ouptut rate that the processing pipeline
+<p>Sources should contemplate a method of guaranteeing an output rate that the processing pipeline
 can cope with, being the most naive implementation providing an attribute to drop frames or
 reduce frame quality.</p>
 </div>
@@ -188,7 +188,10 @@ reduce frame quality.</p>
 <p>This module contains the core components for video input.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.sources.VideoReader">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sources.</span></span><span class="sig-name descname"><span class="pre">VideoReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.VideoReader" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sources.</span></span><span class="sig-name descname"><span class="pre">VideoReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.VideoReader" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sources.VideoReader.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><em class="property"> <span class="pre">=</span> <span class="pre">&lt;Logger</span> <span class="pre">videoanalytics.pipeline.sources</span> <span class="pre">(WARNING)&gt;</span></em><a class="headerlink" href="#videoanalytics.pipeline.sources.VideoReader.logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads video from a file using OpenCV capture device interface.</p>
 <p>This component <strong>WRITES</strong> the following entries in the global context:</p>
 <table class="docutils align-default">
@@ -230,6 +233,7 @@ reduce frame quality.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
 <li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
 <li><p><strong>video_path</strong> (<em>str</em>) – input video filename.</p></li>
 <li><p><strong>start_frame</strong> (<em>int</em>) – start frame (default is 0).</p></li>
@@ -240,6 +244,8 @@ a high framerate.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.sources.VideoReader.read">
 <span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.VideoReader.read" title="Permalink to this definition">¶</a></dt>
