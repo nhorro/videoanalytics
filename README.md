@@ -53,23 +53,10 @@ Some components present in the current version of the library:
 
 ## Instructions for developers
 
-A GPU conda environment is provided for development.
-
-Import conda environment (GPU):
-
-~~~bash
-conda env create -f videoanalytics-gpu.yml
-~~~
-
-Some examples are provided as jupyter notebooks.
-
-~~~bash
-conda activate videoanalytics-gpu.yml
-jupyter notebook .
-~~~
+Refer to [wiki](https://github.com/nhorro/videoanalytics/wiki) for development instructions.
 
 ## References
 
-1. [Wikipedia article for video content analyis] (https://en.wikipedia.org/wiki/Video_content_analysis)
+1. [Wikipedia article for video content analyis](https://en.wikipedia.org/wiki/Video_content_analysis)
 2. Code for YOLOv4 and DeepSORT was adapted from [yolov4-deepsort](https://github.com/theAIGuysCode/yolov4-deepsort).
 3. [EDN Introduction to video analytics](https://www.edn.com/introduction-to-video-analytics/)
