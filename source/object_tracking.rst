@@ -7,10 +7,14 @@ unique objects in a scene.
 API reference
 -------------
 
+
+.. automodule:: videoanalytics.pipeline.sinks.object_tracking
+   :members:   
+
 SORT
 ^^^^
 
-.. automodule:: videoanalytics.pipeline.sinks.trackers.sort
+.. automodule:: videoanalytics.pipeline.sinks.object_tracking.sort
    :members:   
 
 DeepSORT

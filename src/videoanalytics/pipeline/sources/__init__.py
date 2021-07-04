@@ -10,7 +10,12 @@ import logging
 import cv2
 import numpy as np
 
-from tqdm import tqdm
+# FIXME
+import sys
+if 'ipykernel' in sys.modules:
+    from tqdm.notebook import tqdm
+else:
+    from tqdm import tqdm
 
 from videoanalytics.pipeline import Source
 

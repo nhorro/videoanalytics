@@ -1,5 +1,4 @@
 import sys
-sys.path.append("../../../src")
 
 from videoanalytics.pipeline import Pipeline
 from videoanalytics.pipeline.sources import VideoReader
@@ -39,6 +38,5 @@ if __name__ == "__main__":
     # 5. Execute
     pipeline.execute()
 
-    # 6. Report
+    # 6. Report (optional)
     print(pipeline.get_metrics())
-

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Implementation-independent object detection related components.
+Implementation of object detection related components.
 """
 
 from videoanalytics.utils import read_class_names

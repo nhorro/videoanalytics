@@ -7,6 +7,7 @@ Base classes for the pipeline paradigm.
 from abc import ABC, abstractmethod
 import logging
 import networkx as nx
+import matplotlib.pyplot as plt
 import time
 
 
@@ -91,6 +92,9 @@ class Pipeline:
         self.optimized = False
         self.metrics = {}
         self.total_iterations = 0
+        self.abs_t0 = 0
+        self.abs_t1 = 0
+        self.total_elapsed_time = 0
 
     def add_component(self,component):
         self.dag.add_node( component.name, component=component )
@@ -131,6 +135,7 @@ class Pipeline:
             eof_not_reached |= x.read()
 
         i = 0
+        self.abs_t0 = time.perf_counter()          
         while eof_not_reached:
             for x in sinks:
                 t0 = time.perf_counter()                
@@ -146,6 +151,8 @@ class Pipeline:
                 t1 = time.perf_counter()
                 self.metrics[x.name+"_avg_dt"] += t1-t0
             i+=1
+        self.abs_t1 = time.perf_counter()        
+        self.total_elapsed_time = self.abs_t1 - self.abs_t0
     
         # Shutdown  
         self.logger.info("Shutting down pipeline")
@@ -155,4 +162,16 @@ class Pipeline:
             self.metrics[x.name+"_avg_dt"] /= self.total_iterations            
 
     def get_metrics(self):
+        """ Get the average execution time for each block in seconds.
+        """
         return self.metrics
+
+    def get_total_execution_time(self):
+        """ Get the total execution time in seconds.
+        """
+        return self.total_elapsed_time
+
+    def plot(self):
+        nx.draw_networkx(self.dag, 
+            pos=nx.spring_layout(self.dag), with_labels=True, font_weight='bold')
+        plt.show()

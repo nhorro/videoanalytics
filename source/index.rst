@@ -14,7 +14,7 @@ Specific blocks that might require a more detailed discussion are treated in spe
 :doc:`object_detection` and :doc:`object_tracking`.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents
 
    intro   
@@ -26,8 +26,11 @@ Specific blocks that might require a more detailed discussion are treated in spe
    roi
    background
    utils
-   devnotes
-   references
+   examples
+   Basic pipeline.ipynb
+   Image transformations.ipynb
+   Object detection.ipynb   
+   references   
 
 Indices and tables
 ------------------

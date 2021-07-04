@@ -7,6 +7,11 @@ services.
 
 But before entering into the library details, let's try to define what is the motivation behind analyzing video.
 
+Motivation
+----------
+
+FIXME: put introduction here.
+
 What is video analytics?
 ------------------------
 

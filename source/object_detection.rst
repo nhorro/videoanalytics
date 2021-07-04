@@ -16,8 +16,8 @@ implementation alternative, that could reduce the dependencies for videoanalytic
 API reference
 -------------
 
-.. automodule:: videoanalytics.pipeline.sinks.obj_detector
+.. automodule:: videoanalytics.pipeline.sinks.object_detection
    :members:
 
-.. automodule:: videoanalytics.pipeline.sinks.yolo4_detector
+.. automodule:: videoanalytics.pipeline.sinks.object_detection.yolo4
    :members:   

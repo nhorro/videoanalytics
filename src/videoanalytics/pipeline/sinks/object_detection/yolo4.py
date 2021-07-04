@@ -12,7 +12,7 @@ from videoanalytics.pipeline import Sink
 
 import numpy as np
 
-class YOLOv4Detector(Sink):
+class YOLOv4DetectorTF(Sink):
     '''
     YOLOv4 object detector tensorflow implementation.
 
