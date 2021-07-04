@@ -1,6 +1,7 @@
 # videoanalytics
 
 ![PyPI](https://img.shields.io/pypi/v/videoanalytics)
+[![Documentation Status](https://readthedocs.org/projects/videoanalytics/badge/?version=latest)](https://videoanalytics.readthedocs.io/en/latest/?badge=latest)
 
 Python library for fast prototyping [video content analysis](https://en.wikipedia.org/wiki/Video_content_analysis) applications. Relies on OpenCV, Keras, and other standard computer vision and machine learning python packages.
 
