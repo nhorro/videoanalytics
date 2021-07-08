@@ -11,12 +11,13 @@ import cv2
 import csv
 import numpy as np
 import pandas as pd
+import os
 
 from videoanalytics.pipeline import Sink
 
 class DetectionsAnnotator(Sink):
-    def __init__(self, context, class_names_filename,show_label=True):
-        super().__init__(context)
+    def __init__(self, name, context, class_names_filename,show_label=True):
+        super().__init__(name, context)
         self.class_names = read_class_names(class_names_filename)
         self.show_label = show_label
         self.num_classes = len(self.class_names)
@@ -64,9 +65,9 @@ class DetectionsAnnotator(Sink):
         pass
 
 class DetectionsCSVWriter(Sink):
-    def __init__(self, context):
-        super().__init__(context)
-        self.csv_file = open("detections.csv", mode='w')
+    def __init__(self, name, context,filename):
+        super().__init__(name, context)
+        self.csv_file = open(filename, mode='w')
         self.csv_writer = csv.writer(self.csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         
     def setup(self):                
@@ -77,10 +78,15 @@ class DetectionsCSVWriter(Sink):
         for i in range(num_boxes):
             x,y,w,h = out_boxes[i]            
             score = out_scores[i]
-            class_idx = int(out_classes[i])                                   
+            class_idx = int(out_classes[i])   
+
+            # if filename is available, append it
+            filename = self.context['IMG_FILENAME'] if 'IMG_FILENAME' in self.context else ""
+
             self.csv_writer.writerow([self.frame_counter, class_idx, 
                      x,y,w,h,
-                     score
+                     score,
+                     filename
                 ])
             
         self.frame_counter+=1
@@ -93,7 +99,7 @@ class ObjectDetectorCSV(Sink):
     def __init__(self, context,filename):
         super().__init__(context)
         
-        det_columns = ["frame_num","class_idx", "x","y","w","h","score"]        
+        det_columns = ["frame_num","class_idx", "x","y","w","h","score","filename"]        
         self.df = pd.read_csv(filename,names=det_columns)
                 
     def setup(self):        
@@ -115,3 +121,6 @@ class ObjectDetectorCSV(Sink):
     
     def shutdown(self):
         pass        
+  
+
+

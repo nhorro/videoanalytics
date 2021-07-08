@@ -9,11 +9,11 @@ Python library for fast prototyping [video content analysis](https://en.wikipedi
 
 Typical functional blocks of a video analytics application are described in [2]. Some  examples are:
 
-- **Dynamic masking**:	Blocking a part of the video signal based on the signal itself, for example because of privacy concerns.
-- **Motion detection**:	Motion detection is used to determine the presence of relevant motion in the observed scene.
-- **Object detection**:	Object detection is used to determine the presence of a type of object or entity, for example a person or car. Other examples include fire and smoke detection.
-- **Recognition**: Face recognition and Automatic Number Plate Recognition are used to recognize, and therefore possibly identify, persons or cars.
-- **Tamper detection**: Tamper detection is used to determine whether the camera or output signal is tampered with.
+- **Dynamic masking**: blocking a part of the video signal based on the signal itself, for example because of privacy concerns.
+- **Motion detection**: motion detection is used to determine the presence of relevant motion in the observed scene.
+- **Object detection**: object detection is used to determine the presence of a type of object or entity, for example a person or car. Other examples include fire and smoke detection.
+- **Recognition**: face recognition and automatic number plate recognition are used to recognize, and therefore possibly identify, persons or cars.
+- **Tamper detection**: tamper detection is used to determine whether the camera or output signal is tampered with.
 - **Video tracking**: Video tracking is used to determine the location of persons or objects in the video signal, possibly with regard to an external reference grid.
 - **Object counting and event triggering**: activating alarms or registering events when an object enter or leaves a region of the video signal.
 
@@ -21,7 +21,7 @@ This library provides components for each specific task organized as sources and
 Sources consume data from a camera or file and trigger the processing pipeline.
 Sinks process data that was made available from other components and generate new data or perform an action such as storing in a DB.
 
-Some components present in the current version of the library:
+Component list:
 
 - Sources
     - VideoReader

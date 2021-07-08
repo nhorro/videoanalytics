@@ -10,6 +10,13 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import time
 
+# FIXME
+import sys
+if 'ipykernel' in sys.modules:
+    from tqdm import tqdm_notebook as tqdm
+else:
+    from tqdm import tqdm
+
 
 class Source(ABC): 
     name = ""
@@ -40,7 +47,13 @@ class Source(ABC):
         """ This method is called after the process finished.
         """
         pass    
-    
+
+    @abstractmethod
+    def get_progress(self):
+        """ This method is called for components that read from a source of known length.
+        """
+        pass    
+
 class Sink(ABC):
     name = ""
 
@@ -134,6 +147,10 @@ class Pipeline:
         for x in sources:
             eof_not_reached |= x.read()
 
+        # FIXME: progress only works for 1 source right now
+        progress_bar = tqdm(total=100.0)
+        last_progress = sources[0].get_progress()
+
         i = 0
         self.abs_t0 = time.perf_counter()          
         while eof_not_reached:
@@ -150,7 +167,13 @@ class Pipeline:
                 eof_not_reached |= x.read()
                 t1 = time.perf_counter()
                 self.metrics[x.name+"_avg_dt"] += t1-t0
+
+            # FIXME: progress only works for 1 source right now
+            curr_progress = sources[0].get_progress()
+            progress_bar.update(curr_progress-last_progress)            
+            last_progress = curr_progress
             i+=1
+            
         self.abs_t1 = time.perf_counter()        
         self.total_elapsed_time = self.abs_t1 - self.abs_t0
     
