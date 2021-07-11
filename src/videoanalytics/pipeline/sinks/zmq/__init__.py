@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """
-videoanalytics.pipeline.sinks.zmqpub
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Publish a frame in ZMQ. This componente is meant to be used with 
 `nhorro/mpeg-streamer-service docker image <https://hub.docker.com/r/nhorro/mpeg-streamer-service/>`.
 

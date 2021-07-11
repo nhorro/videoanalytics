@@ -3,9 +3,13 @@ actionlib==1.12.0
 alabaster==0.7.12
 angles==1.9.12
 appdirs==1.4.4
+argon2-cffi @ file:///tmp/build/80754af9/argon2-cffi_1613036642480/work
 astunparse==1.6.3
 async-generator==1.10
+attrs @ file:///tmp/build/80754af9/attrs_1604765588209/work
 Babel==2.9.1
+backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
+bleach @ file:///tmp/build/80754af9/bleach_1612211392645/work
 bondpy==1.8.3
 build==0.5.0
 cachetools==4.2.1
@@ -23,6 +27,7 @@ cryptography==3.4.7
 cv-bridge==1.13.0
 cycler==0.10.0
 decorator==5.0.7
+defusedxml @ file:///tmp/build/80754af9/defusedxml_1615228127516/work
 diagnostic-analysis==1.9.3
 diagnostic-common-diagnostics==1.9.3
 diagnostic-updater==1.9.3

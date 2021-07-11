@@ -18,8 +18,8 @@ from videoanalytics.pipeline import Sink
 import json
 
 class ROIView(Sink):        
-    def __init__(self, context,filename):
-        super().__init__(context)
+    def __init__(self, name, context,filename):
+        super().__init__(name, context)
 
         with open(filename) as f:
             self.rois = json.load(f)
@@ -51,8 +51,8 @@ class ROIView(Sink):
 
 
 class ROIObjTest(Sink):        
-    def __init__(self, context,filename):
-        super().__init__(context)
+    def __init__(self, name, context,filename):
+        super().__init__(name, context)
 
         with open(filename) as f:
             self.rois = json.load(f)

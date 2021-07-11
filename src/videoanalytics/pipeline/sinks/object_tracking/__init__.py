@@ -3,3 +3,63 @@
 """
 Implementation of tracking algorithms.
 """
+
+import cv2
+import numpy as np
+import csv
+
+from videoanalytics.pipeline import Sink
+
+class TrackedObjectsAnnotator(Sink):
+    def __init__(self, name, context):
+        super().__init__(name, context)
+                
+    def setup(self):                        
+        pass
+        
+    def process(self):
+        fontScale = 1.0
+        image_h, image_w, _ = self.context["FRAME"].shape
+        bbox_color = (155,200,200)
+        for d in self.context["TRACKED_OBJS"]:
+            obj_id, x,y,w,h = int(d[0]), int(d[1]),int(d[2]),int(d[3]),int(d[4])
+            score = d[4]            
+            bbox_thick = int(0.6 * (image_h + image_w) / 400)
+            c1, c2 = (x, y), (x + w, y + h)
+            cv2.rectangle(self.context["FRAME"], c1, c2, bbox_color, bbox_thick)
+            bbox_mess = 'ID %03d' % obj_id            
+            t_size = cv2.getTextSize(bbox_mess, 0, fontScale, thickness=bbox_thick // 2)[0]
+            c3 = (c1[0] + t_size[0], c1[1] - t_size[1] - 3)
+            cv2.rectangle(self.context["FRAME"], c1, 
+                (np.float32(c3[0]), np.float32(c3[1])), bbox_color, -1) #filled
+            cv2.putText(self.context["FRAME"], bbox_mess, (c1[0], np.float32(c1[1] - 2)), 
+                cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 0, 0), 
+                bbox_thick // 2, lineType=cv2.LINE_AA)
+            
+    def shutdown(self):        
+        pass
+
+
+
+class TrackedObjectsCSVWriter(Sink):
+    def __init__(self, name, context, filename):
+        super().__init__(name, context)
+        self.csv_file = open(filename, mode='w')
+        self.csv_writer = csv.writer(self.csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        self.frame_counter = 0
+    def setup(self):                        
+        pass
+        
+    def process(self):
+        fontScale = 1.0
+        image_h, image_w, _ = self.context["FRAME"].shape
+        bbox_color = (155,200,200)
+        for d in self.context["TRACKED_OBJS"]:
+            obj_id, x,y,w,h = int(d[0]), int(d[1]),int(d[2]),int(d[3]),int(d[4])
+            self.csv_writer.writerow([self.frame_counter, obj_id, 
+                     x,y,w,h ])
+        self.frame_counter+=1
+            
+    def shutdown(self):        
+        self.csv_file.close()    
+        pass    

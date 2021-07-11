@@ -7,7 +7,7 @@ This module contains a YOLOv4 object detector tensorflow implementation.
 import tensorflow as tf
 import cv2
 from tensorflow.python.saved_model import tag_constants
-from videoanalytics.utils import format_boxes
+from videoanalytics.utils.boundingboxes import format_boxes
 from videoanalytics.pipeline import Sink
 
 import numpy as np

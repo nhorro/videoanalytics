@@ -7,6 +7,7 @@ Base classes for the pipeline paradigm.
 from abc import ABC, abstractmethod
 import logging
 import networkx as nx
+from networkx.drawing.nx_agraph import graphviz_layout
 import matplotlib.pyplot as plt
 import time
 
@@ -194,7 +195,11 @@ class Pipeline:
         """
         return self.total_elapsed_time
 
-    def plot(self):
+    def plot(self,ax):
+        #nx.draw_networkx(self.dag, 
+        #    pos=nx.spring_layout(self.dag), with_labels=True, font_weight='bold')
+        #plt.show()
         nx.draw_networkx(self.dag, 
-            pos=nx.spring_layout(self.dag), with_labels=True, font_weight='bold')
-        plt.show()
+                 pos=graphviz_layout(self.dag, prog='neato'), 
+                 node_size=4000, arrowsize=20,node_shape="o",node_color="#1f78b4",
+                 with_labels=True, font_weight='bold',ax=ax)        

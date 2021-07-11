@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """
-videoanalytics.pipeline.sinks.background
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Components for background substraction and movement estimation.
 """
 
