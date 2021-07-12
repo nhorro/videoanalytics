@@ -27,7 +27,6 @@ google-pasta==0.2.0
 grpcio==1.37.0
 h5py==2.10.0
 idna==2.10
-image-geometry==1.13.0
 imagesize==1.2.0
 iniconfig==1.1.1
 interactive-markers==1.11.5
