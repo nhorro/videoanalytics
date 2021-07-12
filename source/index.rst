@@ -25,6 +25,8 @@ Specific blocks that might require a more detailed discussion are treated in spe
    object_tracking
    roi
    background
+   database
+   zeromq
    utils
    Basic pipeline.ipynb
    Image transformations.ipynb
