@@ -1,5 +1,4 @@
 alabaster==0.7.12
-angles==1.9.12
 appdirs==1.4.4
 astunparse==1.6.3
 async-generator==1.10
