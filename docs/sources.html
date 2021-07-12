@@ -35,6 +35,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -102,7 +103,10 @@
 <li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic%20pipeline.html">A basic pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Image%20transformations.html">Image transformation pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
 </ul>
 
@@ -171,7 +175,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sources">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="sources">
 <h1>Sources<a class="headerlink" href="#sources" title="Permalink to this headline">¶</a></h1>
 <p>Sources abstract the details of implementation of different signal acquisition methods.
 The obtained signal is fragmented into a sequence of a meaningful units of information.
@@ -186,12 +214,87 @@ reduce frame quality.</p>
 <div class="section" id="module-videoanalytics.pipeline.sources">
 <span id="api-reference"></span><h2>API reference<a class="headerlink" href="#module-videoanalytics.pipeline.sources" title="Permalink to this headline">¶</a></h2>
 <p>This module contains the core components for video input.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#videoanalytics.pipeline.sources.VideoReader" title="videoanalytics.pipeline.sources.VideoReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">VideoReader</span></code></a>: reads a video file and triggers an iteration of the pipeline for each frame, unless the skip_frames parameter is specified.</p></li>
+<li><p><a class="reference internal" href="#videoanalytics.pipeline.sources.ImageSequenceReader" title="videoanalytics.pipeline.sources.ImageSequenceReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageSequenceReader</span></code></a>: reads a list containing a sequence of images.</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sources.ImageSequenceReader">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sources.</span></span><span class="sig-name descname"><span class="pre">ImageSequenceReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_seq</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.ImageSequenceReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads sequence of images from a list of files.</p>
+<p>This component <strong>WRITES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>IMG_FILENAME</p></td>
+<td colspan="3"><p>Input image name.</p></td>
+</tr>
+<tr class="row-odd"><td><p>INPUT_WIDTH</p></td>
+<td colspan="3"><p>Input image width in pixels.</p></td>
+</tr>
+<tr class="row-even"><td><p>INPUT_HEIGHT</p></td>
+<td colspan="3"><p>Input image height in pixels.</p></td>
+</tr>
+<tr class="row-odd"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+<tr class="row-even"><td><p>START_FRAME</p></td>
+<td colspan="3"><p>First element of the sequence (always 0, only for
+compatibility with other sources)</p></td>
+</tr>
+<tr class="row-odd"><td><p>TOTAL_FRAMES</p></td>
+<td colspan="3"><p>Length of the image sequence.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>img_seq</strong> (<em>list</em>) – sequence of images.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sources.ImageSequenceReader.get_progress">
+<span class="sig-name descname"><span class="pre">get_progress</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.ImageSequenceReader.get_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for components that read from a source of known length.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sources.ImageSequenceReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.ImageSequenceReader.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called until it returns None or the processing is cancelled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sources.ImageSequenceReader.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.ImageSequenceReader.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sources.ImageSequenceReader.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.ImageSequenceReader.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="videoanalytics.pipeline.sources.VideoReader">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sources.</span></span><span class="sig-name descname"><span class="pre">VideoReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.VideoReader" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py attribute">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sources.VideoReader.logger">
-<span class="sig-name descname"><span class="pre">logger</span></span><em class="property"> <span class="pre">=</span> <span class="pre">&lt;Logger</span> <span class="pre">videoanalytics.pipeline.sources</span> <span class="pre">(WARNING)&gt;</span></em><a class="headerlink" href="#videoanalytics.pipeline.sources.VideoReader.logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads video from a file using OpenCV capture device interface.</p>
 <p>This component <strong>WRITES</strong> the following entries in the global context:</p>
 <table class="docutils align-default">
@@ -244,6 +347,10 @@ a high framerate.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sources.VideoReader.get_progress">
+<span class="sig-name descname"><span class="pre">get_progress</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sources.VideoReader.get_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for components that read from a source of known length.</p>
 </dd></dl>
 
 <dl class="py method">

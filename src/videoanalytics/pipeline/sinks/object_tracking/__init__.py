@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Implementation of tracking algorithms.
+This module contains generic components for tracking algorithms.
 """
 
 import cv2
@@ -11,6 +11,32 @@ import csv
 from videoanalytics.pipeline import Sink
 
 class TrackedObjectsAnnotator(Sink):
+    '''
+    Annotates the tracked objects in a frame displaying a bounding box around each 
+    identified object with its numeric Id.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | TRACKED_OBJS      | Output of an object tracker.                        |
+    +-------------------+-----------------------------------------------------+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+
+    This component **WRITES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+    '''
     def __init__(self, name, context):
         super().__init__(name, context)
                 
@@ -42,6 +68,24 @@ class TrackedObjectsAnnotator(Sink):
 
 
 class TrackedObjectsCSVWriter(Sink):
+    '''
+    Writes the trackings to a CSV file.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | TRACKED_OBJS      | Output of an object tracker.                        |
+    +-------------------+-----------------------------------------------------+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        filename (str): CSV output file.
+    '''
     def __init__(self, name, context, filename):
         super().__init__(name, context)
         self.csv_file = open(filename, mode='w')

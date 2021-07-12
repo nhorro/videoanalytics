@@ -6,7 +6,7 @@ of data shared by more than one component.
 """
 
 def read_class_names(filename):
-    '''Reads a textfile containing classes names in DarkNet format.
+    '''Reads a text file containing classes names in DarkNet format.
         
         Args:
             filename (str): text file. See examples.

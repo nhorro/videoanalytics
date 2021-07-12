@@ -3,9 +3,11 @@
 """
 Implementation of DeepSORT tracking algorithm. 
 
-Note: the code included in this module is only a wrapper class for the 
-[original author code](https://github.com/nwojke/deep_sort/) with minor changes to 
-adjust documentation format or minor refactoring.
+.. admonition:: Note
+
+    The code included in this module is only a wrapper class for the
+    `original paper's code <https://github.com/nwojke/deep_sort/>`__
+    with minor changes to adjust documentation format or minor refactoring.
 """
 
 import numpy as np
@@ -21,6 +23,32 @@ from .detection import Detection
 
 
 class DeepSORT(Sink):
+    '''
+    Wrapper class for the DeepSORT algorithm.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | DETECTIONS        | Output of an object detection model.                |
+    +-------------------+-----------------------------------------------------+
+    | START_FRAME       | Initial frame index.                                |
+    +-------------------+-----------------------------------------------------+
+
+    This component **WRITES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | TRACKED_OBJS      | Object trackings.                                   |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        model_filename(str): filename for the reidentification model.
+    '''
     def __init__(self, name, context, model_filename):
         super().__init__(name, context)
         self.relative_frame_counter = 0            

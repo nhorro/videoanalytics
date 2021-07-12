@@ -2,6 +2,9 @@
 
 """
 This module contains the core components for video input.
+
+- :class:`~VideoReader`: reads a video file and triggers an iteration of the pipeline for each frame, unless the skip_frames parameter is specified.
+- :class:`~ImageSequenceReader`: reads a list containing a sequence of images.
 """
 
 import os
@@ -13,8 +16,6 @@ import numpy as np
 from videoanalytics.pipeline import Source
 
 class VideoReader(Source):
-    logger = logging.getLogger(__name__)
-
     '''
     Reads video from a file using OpenCV capture device interface.
 
@@ -48,6 +49,9 @@ class VideoReader(Source):
                           This option is used for pipelines that can not cope with 
                           a high framerate.
     '''
+
+    logger = logging.getLogger(__name__)
+
     def __init__(self, name, context, video_path:str,
                  start_frame=0,max_frames=None,step_frames=1):
         super().__init__(name,context)
@@ -102,14 +106,13 @@ class VideoReader(Source):
         return self.progress
     
     def shutdown(self):
+
         self.logger.info("Shutting down VideoReader")
         self.cap.release()
 
 
 
 class ImageSequenceReader(Source):
-    logger = logging.getLogger(__name__)
-
     '''
     Reads sequence of images from a list of files.
 
@@ -137,6 +140,9 @@ class ImageSequenceReader(Source):
         context (dict): The global context. 
         img_seq (list): sequence of images.        
     '''
+
+    logger = logging.getLogger(__name__)
+
     def __init__(self, name, context, img_seq:list):
         super().__init__(name,context)
         self.processed_frames = 0

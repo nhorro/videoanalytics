@@ -1,7 +1,39 @@
 # -*- coding: utf-8 -*-
 
 """
-Implementation of object detection related components.
+The main module contains classes and methods for tasks related with object detection. 
+
+Format conventions
+^^^^^^^^^^^^^^^^^^
+
+The are different conventions to represent bounding boxes, being some of them:
+
+- Each bounding box is represented by its top left coordinates and width and height in absolute  
+  values (pixels). This is the most convenient format for extracting patches or annotating.
+- Each bounding box is represented by its center coordinates and width and height in normalized values 
+  (0.0-1.0). This is the format used by YOLO.
+
+Modules :mod:`utils` and :mod:`evaluation` contain utilities for working with different formats.
+
+The adopted format for representing the detections in the global context is storing a tuple with
+the entry name "DETECTIONS" with the following components:
+
+- *out_boxes*: a list of boxes in absolute coordinates (top left, width, height, in pixels).
+- *out_scores*: a list of the scores (confidence) for each predicted box (0.0-1.0).
+- *out_classes*: a list of the class numeric identifier for each box (:math:`0,...,n_{classes}-1`)
+- *num_boxes*: the size of the list
+
+
+The convention used for CSV format in components is to store the each detection as a row.
+The columns are:
+
+- *frame_num*: frame number, incremented from variable "START_FRAME" at iteration zero.
+- *class_idx*: numeric identifier of the detected class.
+- *x,y*: top left bounding box coordinate in pixels.
+- *w,h*: width and height of the bounding box in pixels.
+- *score*: confidence for the detection.
+- *filename (optional)*: this field is fulfilled with the "IMG_FILENAME" variable, if present in the context.
+
 """
 
 from videoanalytics.utils import read_class_names
@@ -16,6 +48,34 @@ import os
 from videoanalytics.pipeline import Sink
 
 class DetectionsAnnotator(Sink):
+    '''
+    Annotates the detections in a frame displaying a bounding box around each 
+    identified object.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | DETECTIONS        | Output of an object detection model.                |
+    +-------------------+-----------------------------------------------------+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+
+    This component **WRITES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        class_names_filename (str): text file with class names.
+        show_label (bool): display class name in bounding box.
+    '''
     def __init__(self, name, context, class_names_filename,show_label=True):
         super().__init__(name, context)
         self.class_names = read_class_names(class_names_filename)
@@ -29,10 +89,11 @@ class DetectionsAnnotator(Sink):
         random.seed(0)
         random.shuffle(self.colors)
         random.seed(None)
+
+        self.frame_counter=0     
         
     def setup(self):        
-        n_frames = self.context["TOTAL_FRAMES"]
-        self.frame_counter = self.context["START_FRAME"]
+        pass
             
     def process(self):           
         out_boxes, out_scores, out_classes, num_boxes = self.context["DETECTIONS"]
@@ -65,10 +126,36 @@ class DetectionsAnnotator(Sink):
         pass
 
 class DetectionsCSVWriter(Sink):
+    '''
+    Writes the detections to a CSV file.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | DETECTIONS        | Output of an object detection model.                |
+    +-------------------+-----------------------------------------------------+
+    | FRAME             | Numpy array representing the frame.                 |
+    +-------------------+-----------------------------------------------------+
+    | START_FRAME       | Initial frame index.                                |
+    +-------------------+-----------------------------------------------------+
+    | IMG_FILENAME (*)  | Image filename (for image sequences)                |
+    +-------------------+-----------------------------------------------------+
+
+    (*) Optional.
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        filename (str): CSV output file.
+        show_label (bool): display class name in bounding box.
+    '''
     def __init__(self, name, context,filename):
         super().__init__(name, context)
         self.csv_file = open(filename, mode='w')
-        self.csv_writer = csv.writer(self.csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        self.csv_writer = csv.writer(self.csv_file, delimiter=',', quotechar='"', 
+                                     quoting=csv.QUOTE_MINIMAL)
         
     def setup(self):                
         self.frame_counter = self.context["START_FRAME"]
@@ -95,7 +182,32 @@ class DetectionsCSVWriter(Sink):
         self.csv_file.close()        
 
 
-class ObjectDetectorCSV(Sink):        
+class ObjectDetectorCSV(Sink):     
+    '''
+    This components reads precomputed detections from a CSV file.
+    
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | START_FRAME       | Initial frame index.                                |
+    +-------------------+-----------------------------------------------------+
+  
+    This component **WRITES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | DETECTIONS        | Output of an object detection model.                |
+    +-------------------+-----------------------------------------------------+    
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        class_names_filename (str): text file with class names.
+        show_label (bool): display class name in bounding box.
+    '''   
     def __init__(self, context,filename):
         super().__init__(context)
         
@@ -120,7 +232,4 @@ class ObjectDetectorCSV(Sink):
         self.frame_counter+=1
     
     def shutdown(self):
-        pass        
-  
-
-
+        pass

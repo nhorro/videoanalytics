@@ -18,7 +18,7 @@ help:
 plantuml:
 	plantuml -psvg -o ../source/_static uml/*.uml
 
-github:
+githubpages:
 	@make html
 	@cp -a build/html/. ./docs	
 

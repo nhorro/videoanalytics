@@ -39,7 +39,8 @@ class YOLOv4DetectorTF(Sink):
         allowed_classes (list): set of allowed classes. This option is to restrict
                                 the detections to a subset of classes relevant to
                                 the application domain.
-        yolo_input_size (int): size in pixels of the input cell.
+        yolo_input_size (int): size in pixels of the input cell. The input image is 
+                               resized using opencv. 
         yolo_max_output_size_per_class (int): maximum number of detections per class.
         yolo_max_total_size (int): maximum number of detections.
         yolo_iou_threshold (float): minimum IoU to accept detection.

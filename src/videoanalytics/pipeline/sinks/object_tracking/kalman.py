@@ -1,17 +1,23 @@
+# -*- coding: utf-8 -*-
+
+"""
+This module contains an implementation of the Kalman filter for tracking moving boxes in 2D.
+"""
+
 from filterpy.kalman import KalmanFilter
 import numpy as np
 
 from videoanalytics.utils.boundingboxes import convert_bbox_to_z, convert_x_to_bbox
 
 class KalmanBoxTracker(object):
-    """
-    This class represents the internal state of individual tracked objects observed as bbox.
-    """
+    '''
+    This class represents the internal state of individual tracked objects observed as bounding box.
+    
+    Args
+        bbox(np.array): bounding box given by x0,y0,x1,y1 pixel coordinates (non normalized).
+    '''
     count = 0
-    def __init__(self,bbox):
-        """
-        Initialises a tracker using initial bounding box.
-        """
+    def __init__(self,bbox):        
         #define constant velocity model
         self.kf = KalmanFilter(dim_x=7, dim_z=4) 
         self.kf.F = np.array([

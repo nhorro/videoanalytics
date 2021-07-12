@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Loading and processing of polygonal regions of interest (ROIs).
+This module contains components for loading and processing of polygonal regions of interest (ROIs).
 """
 
 import colorsys
@@ -17,7 +17,36 @@ from shapely.geometry.polygon import Polygon
 from videoanalytics.pipeline import Sink
 import json
 
-class ROIView(Sink):        
+class ROIView(Sink):   
+    '''
+    Component for visualization of ROIs on frame.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | START_FRAME       | Initial frame index.                                |
+    +-------------------+-----------------------------------------------------+
+
+    This component **WRITES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | regions(*)        | Region definitions.                                 |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        filename (str): name of JSON file containing region definitions.
+
+    (*) The entry contains a list of dicitonaries with following elements:
+        - polygon: numpy array containing polygon definition
+        - color: color to represent the polygon in the video.
+    
+    '''         
     def __init__(self, name, context,filename):
         super().__init__(name, context)
 
@@ -51,6 +80,35 @@ class ROIView(Sink):
 
 
 class ROIObjTest(Sink):        
+    '''
+    Component for testing the presence of detected objects in ROIs.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | START_FRAME       | Initial frame index.                                |
+    +-------------------+-----------------------------------------------------+
+
+    This component **WRITES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    |  q_{name}         | Number of objects inside region {name}.             |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        filename (str): name of JSON file containing region definitions.
+
+    (*) The entry contains a list of dictionaries containing:
+        - polygon: numpy array containing polygon definition
+        - color: color to represent the polygon in the video.
+    
+    '''   
     def __init__(self, name, context,filename):
         super().__init__(name, context)
 
@@ -83,7 +141,7 @@ class ROIObjTest(Sink):
                 score = out_scores[i]
                 class_idx = int(out_classes[i])
                 point = Point(x, y)
-                self.context["FRAME"] = cv2.circle( self.context["FRAME"], (int(x),int(y)) , 5, (255,0,0))
+                #self.context["FRAME"] = cv2.circle( self.context["FRAME"], (int(x),int(y)) , 5, (255,0,0))
                 if r["polygon"].contains(point):
                     #print("Objeto adentro de {}".format(r["name"]))
                     r["activity"] += 1

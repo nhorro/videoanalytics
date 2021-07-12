@@ -1,0 +1,2087 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Object detection pipeline &mdash; videoanalytics 0.0.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Object tracking pipeline" href="Object%20tracking.html" />
+    <link rel="prev" title="Image transformation pipeline" href="Image%20transformations.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> videoanalytics
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">The pipeline paradigm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sources.html">Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sinks.html">Sinks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="object_detection.html">Object detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="object_tracking.html">Object tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic%20pipeline.html">A basic pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Image%20transformations.html">Image transformation pipeline</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Object detection pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#A-minimal-object-detection-pipeline">A minimal object detection pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Input-and-output-video">Input and output video</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Configuration-of-object-detection-components">Configuration of object detection components</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Pipeline-instantiation-and-execution">Pipeline instantiation and execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Evaluation-of-execution-time">Evaluation of execution time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Exploration-of-results">Exploration of results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#A-pipeline-for-evaluation-of-results-(frame-by-frame-evaluation)">A pipeline for evaluation of results (frame-by-frame evaluation)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Pipeline instantiation and execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Evaluation-of-results">Evaluation of results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Model-selection">Model selection</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">videoanalytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Object detection pipeline</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/Object detection.nblink.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Object-detection-pipeline">
+<h1>Object detection pipeline<a class="headerlink" href="#Object-detection-pipeline" title="Permalink to this headline">¶</a></h1>
+<p>This example shows a basic pipeline that performs object detection on a fragment of video and then proposes a method for evaluation of different detectors.</p>
+<p>Contents:</p>
+<ol class="arabic simple">
+<li><p>A minimal object detection pipeline.</p></li>
+<li><p>A pipeline for evaluating model performance (mAP) and execution time.</p></li>
+<li><p>Model selection.</p></li>
+</ol>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sources</span> <span class="kn">import</span> <span class="n">VideoReader</span>
+<span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks</span> <span class="kn">import</span> <span class="n">VideoWriter</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="A-minimal-object-detection-pipeline">
+<h2>A minimal object detection pipeline<a class="headerlink" href="#A-minimal-object-detection-pipeline" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Configuration">
+<h3>Configuration<a class="headerlink" href="#Configuration" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="Input-and-output-video">
+<h4>Input and output video<a class="headerlink" href="#Input-and-output-video" title="Permalink to this headline">¶</a></h4>
+<p>We will be using the same video as in the previous examples. Note: the video used in this example was downloaded from <a class="reference external" href="https://www.youtube.com/watch?v=WgCe0tMO4lA">youtube</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">DATA_PATH</span> <span class="o">=</span> <span class="s2">&quot;../data/&quot;</span>
+
+<span class="c1"># Input</span>
+<span class="n">INPUT_VIDEO</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;/input/test_video.mp4&quot;</span>
+<span class="n">START_FRAME</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">MAX_FRAMES</span> <span class="o">=</span> <span class="mi">100</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%%HTML</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;text-align: center&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">video</span> <span class="na">width</span><span class="o">=</span><span class="s">&quot;600&quot;</span> <span class="na">height</span><span class="o">=</span><span class="s">&quot;400&quot;</span> <span class="na">controls</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">source</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;../data/input/test_video.mp4&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;video/mp4&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">video</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="text-align: center">
+    <video width="600" height="400" controls>
+      <source src="../data/input/test_video.mp4" type="video/mp4">
+    </video>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Output</span>
+<span class="n">OUTPUT_VIDEO</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span> <span class="s2">&quot;/output/test_output.avi&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Configuration-of-object-detection-components">
+<h4>Configuration of object detection components<a class="headerlink" href="#Configuration-of-object-detection-components" title="Permalink to this headline">¶</a></h4>
+<p>Object detection needs a trained model. For this example we will be using a tensorflow implementation of YOLOv4 for which the weights shall be provided as a checkpoint/frozen graph.</p>
+<p>To visualize bounding boxes, a text file with the names of the classes is also provided. Also, detected bounding boxes are stored in a CSV for later analysis or to work with other algorithms such as SORT.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Specific components for object detection</span>
+<span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_detection</span> <span class="kn">import</span> <span class="n">DetectionsAnnotator</span><span class="p">,</span> <span class="n">DetectionsCSVWriter</span>
+<span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_detection.yolo4</span> <span class="kn">import</span> <span class="n">YOLOv4DetectorTF</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Detector</span>
+
+<span class="c1"># Object Detector model weights (Tensorflow)</span>
+<span class="n">DETECTOR_WEIGHTS_FILENAME</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span> <span class="s2">&quot;object_detection/checkpoints/yolov4-416-tf&quot;</span>
+<span class="c1">#DETECTOR_WEIGHTS_FILENAME = DATA_PATH+ &quot;object_detection/checkpoints/yolov4-tiny-416&quot;</span>
+
+
+<span class="c1"># Classes names for Detections Annotator</span>
+<span class="n">DETECTOR_CLASSES_FILENAME</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;object_detection/classes_definitions/coco.txt&quot;</span>
+
+<span class="c1"># CSV with Detections filename</span>
+<span class="n">DETECTIONS_FILENAME</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;/output/detections.csv&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Pipeline-instantiation-and-execution">
+<h3>Pipeline instantiation and execution<a class="headerlink" href="#Pipeline-instantiation-and-execution" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 1. Create the global context</span>
+<span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># 2. Create the pipeline</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span>
+
+<span class="c1"># 3. Add components</span>
+
+<span class="c1"># 3.1 Source</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">VideoReader</span><span class="p">(</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span>
+                 <span class="n">video_path</span><span class="o">=</span><span class="n">INPUT_VIDEO</span><span class="p">,</span>
+                 <span class="n">start_frame</span><span class="o">=</span><span class="n">START_FRAME</span><span class="p">,</span>
+                 <span class="n">max_frames</span><span class="o">=</span><span class="n">MAX_FRAMES</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 3.2 Detector</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">YOLOv4DetectorTF</span><span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">weights_filename</span><span class="o">=</span><span class="n">DETECTOR_WEIGHTS_FILENAME</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 3.3 Save detections to CSV</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DetectionsCSVWriter</span><span class="p">(</span><span class="s2">&quot;det_csv_writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="n">DETECTIONS_FILENAME</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 3.4 Annotate detections in output video</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DetectionsAnnotator</span><span class="p">(</span><span class="s2">&quot;annotator&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span>
+                                             <span class="n">class_names_filename</span><span class="o">=</span><span class="n">DETECTOR_CLASSES_FILENAME</span><span class="p">,</span>
+                                             <span class="n">show_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 3.3 Sink</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">VideoWriter</span><span class="p">(</span><span class="s2">&quot;writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="n">OUTPUT_VIDEO</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 4. Define connections</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">set_connections</span><span class="p">([</span>
+    <span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;detector&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;det_csv_writer&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;annotator&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;annotator&quot;</span><span class="p">,</span> <span class="s2">&quot;writer&quot;</span><span class="p">)</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/Object_detection_18_0.png" src="_images/Object_detection_18_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 5. Execute</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total execution time [s]:&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_total_execution_time</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c7e7315cf91f4d95994c6d075eaf5398", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total execution time [s]: 51.311861097000474
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Evaluation-of-execution-time">
+<h3>Evaluation of execution time<a class="headerlink" href="#Evaluation-of-execution-time" title="Permalink to this headline">¶</a></h3>
+<p>Note that most of the execution time is being occupied by the object detector. In the setup being tested, an average of 0.5 seconds per frame (~2FPS) makes it unsuitable for real time.</p>
+<p>In the following section a different scheme is proposed to evaluate the performance of the detection, and in the final section both model detection performance and infered time are considered to assist in the configuration of an optimal pipeline for a given scenario.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="c1"># 6. Report (optional)</span>
+<span class="n">metrics_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time [s]&quot;</span><span class="p">])</span>
+<span class="n">metrics_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>time [s]</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>input_avg_dt</th>
+      <td>0.006368</td>
+    </tr>
+    <tr>
+      <th>detector_avg_dt</th>
+      <td>0.482754</td>
+    </tr>
+    <tr>
+      <th>annotator_avg_dt</th>
+      <td>0.000493</td>
+    </tr>
+    <tr>
+      <th>writer_avg_dt</th>
+      <td>0.021735</td>
+    </tr>
+    <tr>
+      <th>det_csv_writer_avg_dt</th>
+      <td>0.000040</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">!</span>lscpu
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Architecture:        x86_64
+CPU op-mode(s):      32-bit, 64-bit
+Byte Order:          Little Endian
+CPU(s):              8
+On-line CPU(s) list: 0-7
+Thread(s) per core:  2
+Core(s) per socket:  4
+Socket(s):           1
+NUMA node(s):        1
+Vendor ID:           GenuineIntel
+CPU family:          6
+Model:               94
+Model name:          Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz
+Stepping:            3
+CPU MHz:             2606.753
+CPU max MHz:         3500,0000
+CPU min MHz:         800,0000
+BogoMIPS:            5199.98
+Virtualization:      VT-x
+L1d cache:           32K
+L1i cache:           32K
+L2 cache:            256K
+L3 cache:            6144K
+NUMA node0 CPU(s):   0-7
+Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb invpcid_single pti ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp md_clear flush_l1d
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Exploration-of-results">
+<h3>Exploration of results<a class="headerlink" href="#Exploration-of-results" title="Permalink to this headline">¶</a></h3>
+<p>Display the output video with annotated bounding boxes.</p>
+<p>Note: currently XVID format is not supported by jupyter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%%HTML</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;text-align: center&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">video</span> <span class="na">width</span><span class="o">=</span><span class="s">&quot;600&quot;</span> <span class="na">height</span><span class="o">=</span><span class="s">&quot;400&quot;</span> <span class="na">controls</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">source</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;../data/output/test_output.avi&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;video/mp4&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">video</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div style="text-align: center">
+    <video width="600" height="400" controls>
+      <source src="../data/output/test_output.avi" type="video/mp4">
+    </video>
+</div></div>
+</div>
+<p>By default <em>DetectionsCSVWriter</em> stores the results in YOLO normalized format (xc,yc,w,h).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_pred_dets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">DETECTIONS_FILENAME</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;frame_num&quot;</span><span class="p">,</span><span class="s2">&quot;class_idx&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="s2">&quot;h&quot;</span><span class="p">,</span><span class="s2">&quot;score&quot;</span><span class="p">,</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
+<span class="n">df_pred_dets</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>frame_num</th>
+      <th>class_idx</th>
+      <th>x</th>
+      <th>y</th>
+      <th>w</th>
+      <th>h</th>
+      <th>score</th>
+      <th>filename</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>860.0</td>
+      <td>361.0</td>
+      <td>140.0</td>
+      <td>137.0</td>
+      <td>0.742915</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>696.0</td>
+      <td>387.0</td>
+      <td>111.0</td>
+      <td>104.0</td>
+      <td>0.620522</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>0</td>
+      <td>860.0</td>
+      <td>361.0</td>
+      <td>140.0</td>
+      <td>137.0</td>
+      <td>0.742915</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>0</td>
+      <td>696.0</td>
+      <td>387.0</td>
+      <td>111.0</td>
+      <td>104.0</td>
+      <td>0.620522</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2</td>
+      <td>0</td>
+      <td>862.0</td>
+      <td>361.0</td>
+      <td>137.0</td>
+      <td>137.0</td>
+      <td>0.657860</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>We can convert this to (x0,y0,x1,y1) format with a more convenient format for visualization and interpretation of results with <em>convert_detections(box_format=“xyxy”)</em>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_detection.utils</span> <span class="kn">import</span> <span class="n">convert_detections</span>
+
+<span class="n">df_pred_dets</span> <span class="o">=</span> <span class="n">convert_detections</span><span class="p">(</span><span class="n">df_pred_dets</span><span class="p">,</span><span class="n">box_format</span><span class="o">=</span><span class="s2">&quot;xyxy&quot;</span><span class="p">)</span>
+
+<span class="c1"># Keep relevant columns only</span>
+<span class="n">df_pred_dets</span> <span class="o">=</span> <span class="n">df_pred_dets</span><span class="p">[[</span><span class="s1">&#39;frame_num&#39;</span><span class="p">,</span><span class="s1">&#39;class_idx&#39;</span><span class="p">,</span><span class="s1">&#39;x0&#39;</span><span class="p">,</span><span class="s1">&#39;y0&#39;</span><span class="p">,</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span><span class="s1">&#39;y1&#39;</span><span class="p">,</span><span class="s1">&#39;score&#39;</span><span class="p">]]</span>
+<span class="n">df_pred_dets</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>frame_num</th>
+      <th>class_idx</th>
+      <th>x0</th>
+      <th>y0</th>
+      <th>x1</th>
+      <th>y1</th>
+      <th>score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>860.0</td>
+      <td>361.0</td>
+      <td>1000.0</td>
+      <td>498.0</td>
+      <td>0.742915</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>696.0</td>
+      <td>387.0</td>
+      <td>807.0</td>
+      <td>491.0</td>
+      <td>0.620522</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>0</td>
+      <td>860.0</td>
+      <td>361.0</td>
+      <td>1000.0</td>
+      <td>498.0</td>
+      <td>0.742915</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>0</td>
+      <td>696.0</td>
+      <td>387.0</td>
+      <td>807.0</td>
+      <td>491.0</td>
+      <td>0.620522</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2</td>
+      <td>0</td>
+      <td>862.0</td>
+      <td>361.0</td>
+      <td>999.0</td>
+      <td>498.0</td>
+      <td>0.657860</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="A-pipeline-for-evaluation-of-results-(frame-by-frame-evaluation)">
+<h2>A pipeline for evaluation of results (frame-by-frame evaluation)<a class="headerlink" href="#A-pipeline-for-evaluation-of-results-(frame-by-frame-evaluation)" title="Permalink to this headline">¶</a></h2>
+<p>The previous example showed how to obtain detections from a video and the average inference time per frame, but it didnt provide a standard metric to evaluate the model precision.</p>
+<p>Even if the task being performed is the identification of objects in a video and the relationship between contiguous frames could improve the quality of the detections, the object detector works on individual frames, so this example modifies the previous pipeline to read files from a directory containing images for which the expected (ground truth) detections are provided in separate text files.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># Each .jpg in test directory has a matching .txt file with the annotations</span>
+<span class="n">TEST_IMG_SEQ_PATH</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;/input/test_img_seq&quot;</span>
+<span class="n">glob</span><span class="p">(</span><span class="n">TEST_IMG_SEQ_PATH</span><span class="o">+</span><span class="s2">&quot;/img*.*&quot;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;../data//input/test_img_seq/img8243.jpg&#39;,
+ &#39;../data//input/test_img_seq/img7463.txt&#39;,
+ &#39;../data//input/test_img_seq/img16689.txt&#39;,
+ &#39;../data//input/test_img_seq/img1603.jpg&#39;,
+ &#39;../data//input/test_img_seq/img16322.txt&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">img_list</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">TEST_IMG_SEQ_PATH</span><span class="o">+</span><span class="s2">&quot;/img*.jpg&quot;</span><span class="p">)</span>
+<span class="n">img_list</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;../data//input/test_img_seq/img8243.jpg&#39;,
+ &#39;../data//input/test_img_seq/img1603.jpg&#39;,
+ &#39;../data//input/test_img_seq/img10956.jpg&#39;,
+ &#39;../data//input/test_img_seq/img11071.jpg&#39;,
+ &#39;../data//input/test_img_seq/img365.jpg&#39;,
+ &#39;../data//input/test_img_seq/img2334.jpg&#39;,
+ &#39;../data//input/test_img_seq/img8722.jpg&#39;,
+ &#39;../data//input/test_img_seq/img16322.jpg&#39;,
+ &#39;../data//input/test_img_seq/img12419.jpg&#39;,
+ &#39;../data//input/test_img_seq/img8240.jpg&#39;,
+ &#39;../data//input/test_img_seq/img7463.jpg&#39;,
+ &#39;../data//input/test_img_seq/img9859.jpg&#39;,
+ &#39;../data//input/test_img_seq/img16689.jpg&#39;,
+ &#39;../data//input/test_img_seq/img5320.jpg&#39;,
+ &#39;../data//input/test_img_seq/img10989.jpg&#39;,
+ &#39;../data//input/test_img_seq/img10606.jpg&#39;,
+ &#39;../data//input/test_img_seq/img15269.jpg&#39;,
+ &#39;../data//input/test_img_seq/img2264.jpg&#39;,
+ &#39;../data//input/test_img_seq/img12115.jpg&#39;]
+</pre></div></div>
+</div>
+<div class="section" id="id1">
+<h3>Pipeline instantiation and execution<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>This step is similar to the other examples, with the only difference that in this case the input and outputs are a sequence of images.</p>
+<p><em>ImageSequenceReader</em> and <em>ImageWriter</em> are used instead of <em>VideoReader</em> and <em>VideoFileWriter</em>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sources</span> <span class="kn">import</span> <span class="n">ImageSequenceReader</span>
+<span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks</span> <span class="kn">import</span> <span class="n">ImageWriter</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 1. Create the global context</span>
+<span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># 2. Create the pipeline</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span>
+
+<span class="c1"># 3. Add components</span>
+
+<span class="c1"># 3.1 Source</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">ImageSequenceReader</span><span class="p">(</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span> <span class="n">img_seq</span><span class="o">=</span><span class="n">img_list</span><span class="p">))</span>
+
+<span class="c1"># 3.2 Detector</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">YOLOv4DetectorTF</span><span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">weights_filename</span><span class="o">=</span><span class="n">DETECTOR_WEIGHTS_FILENAME</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="c1"># 3.3 Save detections to CSV</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DetectionsCSVWriter</span><span class="p">(</span><span class="s2">&quot;det_csv_writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="n">DETECTIONS_FILENAME</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="c1"># 3.4 Annotate detections in output video</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DetectionsAnnotator</span><span class="p">(</span><span class="s2">&quot;annotator&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span>
+                                             <span class="n">class_names_filename</span><span class="o">=</span><span class="n">DETECTOR_CLASSES_FILENAME</span><span class="p">,</span>
+                                             <span class="n">show_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="c1"># 3.5 Sink</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">ImageWriter</span><span class="p">(</span><span class="s2">&quot;writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">output_path</span><span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;/output/&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 4. Define connections</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">set_connections</span><span class="p">([</span>
+    <span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;detector&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;det_csv_writer&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;annotator&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;annotator&quot;</span><span class="p">,</span> <span class="s2">&quot;writer&quot;</span><span class="p">)</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pipeline</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/Object_detection_39_0.png" src="_images/Object_detection_39_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total execution time [s]:&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_total_execution_time</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "fca59bf601cb44cfbd8a7b358fe1dabe", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total execution time [s]: 11.51667647999966
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Evaluation-of-results">
+<h3>Evaluation of results<a class="headerlink" href="#Evaluation-of-results" title="Permalink to this headline">¶</a></h3>
+<p>Steps:</p>
+<ol class="arabic simple">
+<li><p>Build a dataframe with the bounding boxes for the ground truth.</p></li>
+<li><p>Build a dataframe with the bounding boxes for the predictions.</p></li>
+<li><p>Evaluate using different variants of mAP.</p></li>
+</ol>
+<ol class="arabic simple">
+<li><p>Build a dataframe with the bounding boxes for the ground truth.</p></li>
+</ol>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">det_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.txt&#39;</span> <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">img_list</span><span class="p">]</span>
+<span class="n">det_list</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;../data//input/test_img_seq/img8243.txt&#39;,
+ &#39;../data//input/test_img_seq/img1603.txt&#39;,
+ &#39;../data//input/test_img_seq/img10956.txt&#39;,
+ &#39;../data//input/test_img_seq/img11071.txt&#39;,
+ &#39;../data//input/test_img_seq/img365.txt&#39;,
+ &#39;../data//input/test_img_seq/img2334.txt&#39;,
+ &#39;../data//input/test_img_seq/img8722.txt&#39;,
+ &#39;../data//input/test_img_seq/img16322.txt&#39;,
+ &#39;../data//input/test_img_seq/img12419.txt&#39;,
+ &#39;../data//input/test_img_seq/img8240.txt&#39;,
+ &#39;../data//input/test_img_seq/img7463.txt&#39;,
+ &#39;../data//input/test_img_seq/img9859.txt&#39;,
+ &#39;../data//input/test_img_seq/img16689.txt&#39;,
+ &#39;../data//input/test_img_seq/img5320.txt&#39;,
+ &#39;../data//input/test_img_seq/img10989.txt&#39;,
+ &#39;../data//input/test_img_seq/img10606.txt&#39;,
+ &#39;../data//input/test_img_seq/img15269.txt&#39;,
+ &#39;../data//input/test_img_seq/img2264.txt&#39;,
+ &#39;../data//input/test_img_seq/img12115.txt&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_detection.utils</span> <span class="kn">import</span> <span class="n">load_detections_from_file_list</span>
+
+<span class="n">df_gt_dets</span> <span class="o">=</span> <span class="n">load_detections_from_file_list</span><span class="p">(</span><span class="n">det_list</span><span class="p">)</span>
+<span class="n">df_gt_dets</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+      <th>frame_num</th>
+      <th>class_idx</th>
+      <th>x</th>
+      <th>y</th>
+      <th>w</th>
+      <th>h</th>
+      <th>img_w</th>
+      <th>img_h</th>
+      <th>x0</th>
+      <th>x1</th>
+      <th>y0</th>
+      <th>y1</th>
+      <th>difficult</th>
+      <th>crowd</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1287.99936</td>
+      <td>804.99960</td>
+      <td>338.00064</td>
+      <td>525.99996</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>1118.99904</td>
+      <td>1456.99968</td>
+      <td>541.99962</td>
+      <td>1067.99958</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>0</td>
+      <td>612.00000</td>
+      <td>460.00008</td>
+      <td>110.00064</td>
+      <td>216.00000</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>556.99968</td>
+      <td>667.00032</td>
+      <td>352.00008</td>
+      <td>568.00008</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>0</td>
+      <td>706.99968</td>
+      <td>426.99960</td>
+      <td>120.00000</td>
+      <td>185.99976</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>646.99968</td>
+      <td>766.99968</td>
+      <td>333.99972</td>
+      <td>519.99948</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1134.00000</td>
+      <td>456.99984</td>
+      <td>150.00000</td>
+      <td>253.99980</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>1059.00000</td>
+      <td>1209.00000</td>
+      <td>329.99994</td>
+      <td>583.99974</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1651.49952</td>
+      <td>737.49960</td>
+      <td>301.00032</td>
+      <td>388.99980</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>1500.99936</td>
+      <td>1801.99968</td>
+      <td>542.99970</td>
+      <td>931.99950</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Build a dataframe with the bounding boxes for the predictions.</p></li>
+</ol>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_pred_dets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">DETECTIONS_FILENAME</span><span class="p">,</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;frame_num&quot;</span><span class="p">,</span><span class="s2">&quot;class_idx&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="s2">&quot;h&quot;</span><span class="p">,</span><span class="s2">&quot;score&quot;</span><span class="p">,</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
+<span class="n">df_pred_dets</span> <span class="o">=</span> <span class="n">convert_detections</span><span class="p">(</span><span class="n">df_pred_dets</span><span class="p">)</span>
+<span class="n">df_pred_dets</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>frame_num</th>
+      <th>class_idx</th>
+      <th>x</th>
+      <th>y</th>
+      <th>w</th>
+      <th>h</th>
+      <th>score</th>
+      <th>filename</th>
+      <th>x0</th>
+      <th>y0</th>
+      <th>x1</th>
+      <th>y1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1125.0</td>
+      <td>559.0</td>
+      <td>305.0</td>
+      <td>483.0</td>
+      <td>0.718696</td>
+      <td>img8243</td>
+      <td>1125.0</td>
+      <td>559.0</td>
+      <td>1430.0</td>
+      <td>1042.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>641.0</td>
+      <td>341.0</td>
+      <td>130.0</td>
+      <td>127.0</td>
+      <td>0.672495</td>
+      <td>img8243</td>
+      <td>641.0</td>
+      <td>341.0</td>
+      <td>771.0</td>
+      <td>468.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>0</td>
+      <td>1191.0</td>
+      <td>365.0</td>
+      <td>90.0</td>
+      <td>134.0</td>
+      <td>0.589164</td>
+      <td>img1603</td>
+      <td>1191.0</td>
+      <td>365.0</td>
+      <td>1281.0</td>
+      <td>499.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>537.0</td>
+      <td>362.0</td>
+      <td>481.0</td>
+      <td>0.862434</td>
+      <td>img10956</td>
+      <td>0.0</td>
+      <td>537.0</td>
+      <td>362.0</td>
+      <td>1018.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1202.0</td>
+      <td>800.0</td>
+      <td>625.0</td>
+      <td>280.0</td>
+      <td>0.629002</td>
+      <td>img10956</td>
+      <td>1202.0</td>
+      <td>800.0</td>
+      <td>1827.0</td>
+      <td>1080.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Test with a sample image for class 0 (person).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_detection.utils</span> <span class="kn">import</span> <span class="n">plot_predictions_vs_ground_truth</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">12</span><span class="p">))</span>
+<span class="n">plot_predictions_vs_ground_truth</span><span class="p">(</span><span class="n">df_gt_dets</span><span class="p">,</span><span class="n">df_pred_dets</span><span class="p">,</span>
+                                 <span class="n">img_path</span><span class="o">=</span><span class="s1">&#39;../data//input/test_img_seq/&#39;</span><span class="p">,</span>
+                                 <span class="n">img_name</span><span class="o">=</span><span class="s1">&#39;img8243&#39;</span><span class="p">,</span>
+                                 <span class="n">class_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                 <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/Object_detection_48_0.png" src="_images/Object_detection_48_0.png" />
+</div>
+</div>
+<p>Evaluate using different variants of mAP.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_detection.evaluation</span> <span class="kn">import</span> <span class="n">evaluate_object_detection_predictions</span>
+
+<span class="n">df_od_metrics</span> <span class="o">=</span> <span class="n">evaluate_object_detection_predictions</span><span class="p">(</span>
+    <span class="n">df_gt_dets</span><span class="p">,</span> <span class="n">df_pred_dets</span><span class="p">,</span> <span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;yolov4&quot;</span><span class="p">)</span>
+<span class="n">df_od_metrics</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>VOC PASCAL</th>
+      <th>VOC PASCAL (all points)</th>
+      <th>COCO</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>yolov4</th>
+      <td>0.545455</td>
+      <td>0.5</td>
+      <td>0.254455</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Model-selection">
+<h2>Model selection<a class="headerlink" href="#Model-selection" title="Permalink to this headline">¶</a></h2>
+<p>The following example defines a function to instantiate a minimal object detection pipeline specyfing the weights and classes file, which is the used to test a set of models and collect their metrics of interest (the mAPs and average per frame/total execution times).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">make_pipeline</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">eval_img_list</span><span class="p">,</span> <span class="n">weights_filename</span><span class="p">,</span><span class="n">detections_csv_filename</span><span class="p">,</span><span class="n">detector_classes_filename</span><span class="p">,</span>
+                  <span class="n">save_imgs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">output_img_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span>
+    <span class="n">connections</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;detector&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;det_csv_writer&quot;</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">ImageSequenceReader</span><span class="p">(</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span> <span class="n">img_seq</span><span class="o">=</span><span class="n">eval_img_list</span><span class="p">))</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">YOLOv4DetectorTF</span><span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">weights_filename</span><span class="o">=</span><span class="n">weights_filename</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DetectionsCSVWriter</span><span class="p">(</span><span class="s2">&quot;det_csv_writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="n">detections_csv_filename</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">save_imgs</span><span class="p">:</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DetectionsAnnotator</span><span class="p">(</span><span class="s2">&quot;annotator&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span>
+                                             <span class="n">class_names_filename</span><span class="o">=</span><span class="n">detector_classes_filename</span><span class="p">,</span>
+                                             <span class="n">show_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">ImageWriter</span><span class="p">(</span><span class="s2">&quot;writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">output_path</span><span class="o">=</span><span class="n">output_img_path</span><span class="p">))</span>
+        <span class="n">connections</span><span class="o">+=</span><span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;annotator&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;annotator&quot;</span><span class="p">,</span> <span class="s2">&quot;writer&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">set_connections</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pipeline</span>
+</pre></div>
+</div>
+</div>
+<p>Reload ground truth dataframe as an previous example.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Ground truth</span>
+<span class="n">det_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;.txt&#39;</span> <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">img_list</span><span class="p">]</span>
+<span class="n">df_gt_dets</span> <span class="o">=</span> <span class="n">load_detections_from_file_list</span><span class="p">(</span><span class="n">det_list</span><span class="p">)</span>
+<span class="n">df_gt_dets</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>filename</th>
+      <th>frame_num</th>
+      <th>class_idx</th>
+      <th>x</th>
+      <th>y</th>
+      <th>w</th>
+      <th>h</th>
+      <th>img_w</th>
+      <th>img_h</th>
+      <th>x0</th>
+      <th>x1</th>
+      <th>y0</th>
+      <th>y1</th>
+      <th>difficult</th>
+      <th>crowd</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1287.99936</td>
+      <td>804.99960</td>
+      <td>338.00064</td>
+      <td>525.99996</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>1118.99904</td>
+      <td>1456.99968</td>
+      <td>541.99962</td>
+      <td>1067.99958</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>0</td>
+      <td>612.00000</td>
+      <td>460.00008</td>
+      <td>110.00064</td>
+      <td>216.00000</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>556.99968</td>
+      <td>667.00032</td>
+      <td>352.00008</td>
+      <td>568.00008</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>0</td>
+      <td>706.99968</td>
+      <td>426.99960</td>
+      <td>120.00000</td>
+      <td>185.99976</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>646.99968</td>
+      <td>766.99968</td>
+      <td>333.99972</td>
+      <td>519.99948</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1134.00000</td>
+      <td>456.99984</td>
+      <td>150.00000</td>
+      <td>253.99980</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>1059.00000</td>
+      <td>1209.00000</td>
+      <td>329.99994</td>
+      <td>583.99974</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>img8243</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1651.49952</td>
+      <td>737.49960</td>
+      <td>301.00032</td>
+      <td>388.99980</td>
+      <td>1920</td>
+      <td>1080</td>
+      <td>1500.99936</td>
+      <td>1801.99968</td>
+      <td>542.99970</td>
+      <td>931.99950</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Collect results in this datframe.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_od_metrics</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="s2">&quot;avg_exec_time&quot;</span><span class="p">,</span><span class="s2">&quot;total_exec_time&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_model_sel_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">df_model_sel_results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>VOC PASCAL</th>
+      <th>VOC PASCAL (all points)</th>
+      <th>COCO</th>
+      <th>avg_exec_time</th>
+      <th>total_exec_time</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Define paths with model parameters (for this example only YOLOv4 tensorflow implementation variants are considered) and temporary outputs.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">CHECKPOINTS_PATH</span> <span class="o">=</span> <span class="s2">&quot;../data/object_detection/checkpoints/&quot;</span>
+<span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;/output/&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>Dictionary containing models to test.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">models_to_test</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;yolov4&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="n">CHECKPOINTS_PATH</span> <span class="o">+</span> <span class="s2">&quot;yolov4-416-tf&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;yolov4-tiny&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="n">CHECKPOINTS_PATH</span> <span class="o">+</span> <span class="s2">&quot;yolov4-tiny-416&quot;</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Run each model in the same test set.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">model_name</span><span class="p">,</span><span class="n">model_params</span> <span class="ow">in</span> <span class="n">models_to_test</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Evaluating model </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+    <span class="n">detections_csv_filename</span><span class="o">=</span><span class="n">OUTPUT_PATH</span><span class="o">+</span><span class="n">model_name</span><span class="o">+</span><span class="s2">&quot;.csv&quot;</span>
+
+    <span class="c1"># 1. Build pipeline</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">img_list</span><span class="p">,</span> <span class="n">weights_filename</span><span class="o">=</span><span class="n">model_params</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">],</span>
+                             <span class="n">detections_csv_filename</span><span class="o">=</span><span class="n">detections_csv_filename</span><span class="p">,</span>
+                             <span class="n">detector_classes_filename</span><span class="o">=</span><span class="n">DETECTOR_CLASSES_FILENAME</span><span class="p">,</span>
+                             <span class="n">save_imgs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># 2. Execute pipeline</span>
+    <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+    <span class="n">total_exec_time</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_total_execution_time</span><span class="p">()</span>
+
+    <span class="n">df_pipeline_metrics</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time [s]&quot;</span><span class="p">])</span>
+
+    <span class="c1"># 3. Read predictions</span>
+    <span class="n">df_pred_dets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">detections_csv_filename</span><span class="p">,</span>
+                               <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;frame_num&quot;</span><span class="p">,</span><span class="s2">&quot;class_idx&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="s2">&quot;h&quot;</span><span class="p">,</span><span class="s2">&quot;score&quot;</span><span class="p">,</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
+    <span class="n">df_pred_dets</span> <span class="o">=</span> <span class="n">convert_detections</span><span class="p">(</span><span class="n">df_pred_dets</span><span class="p">)</span>
+
+    <span class="c1"># 4. Evaluate and append results</span>
+    <span class="n">df_od_metrics</span> <span class="o">=</span> <span class="n">evaluate_object_detection_predictions</span><span class="p">(</span> <span class="n">df_gt_dets</span><span class="p">,</span> <span class="n">df_pred_dets</span><span class="p">,</span>
+                                                           <span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
+    <span class="n">df_od_metrics</span><span class="p">[</span><span class="s1">&#39;avg_exec_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_pipeline_metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;detector_avg_dt&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">df_od_metrics</span><span class="p">[</span><span class="s1">&#39;total_exec_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_exec_time</span>
+
+    <span class="n">df_model_sel_results</span> <span class="o">=</span> <span class="n">df_model_sel_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">df_od_metrics</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Evaluating model yolov4
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c724c4c3427347c4ae59884160c0df63", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Evaluating model yolov4-tiny
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "e003622ed7bd48cbb36909a97ebc817f", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_model_sel_results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>VOC PASCAL</th>
+      <th>VOC PASCAL (all points)</th>
+      <th>COCO</th>
+      <th>avg_exec_time</th>
+      <th>total_exec_time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>yolov4</th>
+      <td>0.545455</td>
+      <td>0.5</td>
+      <td>0.254455</td>
+      <td>0.494261</td>
+      <td>10.047086</td>
+    </tr>
+    <tr>
+      <th>yolov4-tiny</th>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.065422</td>
+      <td>1.896999</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="Object%20tracking.html" class="btn btn-neutral float-right" title="Object tracking pipeline" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Image%20transformations.html" class="btn btn-neutral float-left" title="Image transformation pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Nicolás Eduardo Horro.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

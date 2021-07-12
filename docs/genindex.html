@@ -35,6 +35,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -96,7 +97,10 @@
 <li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic%20pipeline.html">A basic pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Image%20transformations.html">Image transformation pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
 </ul>
 
@@ -173,13 +177,10 @@
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
- | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
- | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
- | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
@@ -196,7 +197,7 @@
       <li><a href="pipeline.html#videoanalytics.pipeline.Sink.__init__">__init__() (videoanalytics.pipeline.Sink method)</a>
 
       <ul>
-        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.__init__">(videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker method)</a>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.sort.Sort.__init__">(videoanalytics.pipeline.sinks.object_tracking.sort.Sort method)</a>
 </li>
         <li><a href="pipeline.html#videoanalytics.pipeline.Source.__init__">(videoanalytics.pipeline.Source method)</a>
 </li>
@@ -207,7 +208,7 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.associate_detections_to_trackers">associate_detections_to_trackers() (in module videoanalytics.pipeline.sinks.trackers.sort)</a>
+      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.sort.associate_detections_to_trackers">associate_detections_to_trackers() (in module videoanalytics.pipeline.sinks.object_tracking.sort)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -227,11 +228,7 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.convert_bbox_to_z">convert_bbox_to_z() (in module videoanalytics.pipeline.sinks.trackers.sort)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.convert_x_to_bbox">convert_x_to_bbox() (in module videoanalytics.pipeline.sinks.trackers.sort)</a>
+      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.utils.convert_detections">convert_detections() (in module videoanalytics.pipeline.sinks.object_detection.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -239,11 +236,13 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.DetectionsAnnotator">DetectionsAnnotator (class in videoanalytics.pipeline.sinks.obj_detector)</a>
+      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT">DeepSORT (class in videoanalytics.pipeline.sinks.object_tracking.deepsort)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.DetectionsCSVWriter">DetectionsCSVWriter (class in videoanalytics.pipeline.sinks.obj_detector)</a>
+      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator">DetectionsAnnotator (class in videoanalytics.pipeline.sinks.object_detection)</a>
+</li>
+      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter">DetectionsCSVWriter (class in videoanalytics.pipeline.sinks.object_detection)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -254,12 +253,10 @@
       <li><a href="pipeline.html#videoanalytics.pipeline.Sink.enable_display">enable_display() (videoanalytics.pipeline.Sink method)</a>
 </li>
   </ul></td>
-</tr></table>
-
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="utils.html#videoanalytics.utils.format_boxes">format_boxes() (in module videoanalytics.utils)</a>
+      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.evaluation.evaluate_object_detection_predictions">evaluate_object_detection_predictions() (in module videoanalytics.pipeline.sinks.object_detection.evaluation)</a>
+</li>
+      <li><a href="pipeline.html#videoanalytics.pipeline.Pipeline.execute">execute() (videoanalytics.pipeline.Pipeline method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -267,7 +264,19 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.get_state">get_state() (videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker method)</a>
+      <li><a href="pipeline.html#videoanalytics.pipeline.Pipeline.get_metrics">get_metrics() (videoanalytics.pipeline.Pipeline method)</a>
+</li>
+      <li><a href="pipeline.html#videoanalytics.pipeline.Source.get_progress">get_progress() (videoanalytics.pipeline.Source method)</a>
+
+      <ul>
+        <li><a href="sources.html#videoanalytics.pipeline.sources.ImageSequenceReader.get_progress">(videoanalytics.pipeline.sources.ImageSequenceReader method)</a>
+</li>
+        <li><a href="sources.html#videoanalytics.pipeline.sources.VideoReader.get_progress">(videoanalytics.pipeline.sources.VideoReader method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipeline.html#videoanalytics.pipeline.Pipeline.get_total_execution_time">get_total_execution_time() (videoanalytics.pipeline.Pipeline method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -275,15 +284,11 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.iou_batch">iou_batch() (in module videoanalytics.pipeline.sinks.trackers.sort)</a>
+      <li><a href="sources.html#videoanalytics.pipeline.sources.ImageSequenceReader">ImageSequenceReader (class in videoanalytics.pipeline.sources)</a>
 </li>
   </ul></td>
-</tr></table>
-
-<h2 id="K">K</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker">KalmanBoxTracker (class in videoanalytics.pipeline.sinks.trackers.sort)</a>
+      <li><a href="sinks.html#videoanalytics.pipeline.sinks.ImageWriter">ImageWriter (class in videoanalytics.pipeline.sinks)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -291,7 +296,7 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="sources.html#videoanalytics.pipeline.sources.VideoReader.logger">logger (videoanalytics.pipeline.sources.VideoReader attribute)</a>
+      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list">load_detections_from_file_list() (in module videoanalytics.pipeline.sinks.object_detection.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -309,13 +314,21 @@
 </li>
         <li><a href="background.html#module-videoanalytics.pipeline.sinks.background">videoanalytics.pipeline.sinks.background</a>
 </li>
-        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.obj_detector">videoanalytics.pipeline.sinks.obj_detector</a>
+        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection">videoanalytics.pipeline.sinks.object_detection</a>
+</li>
+        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.evaluation">videoanalytics.pipeline.sinks.object_detection.evaluation</a>
+</li>
+        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.utils">videoanalytics.pipeline.sinks.object_detection.utils</a>
+</li>
+        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.yolo4">videoanalytics.pipeline.sinks.object_detection.yolo4</a>
+</li>
+        <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking">videoanalytics.pipeline.sinks.object_tracking</a>
+</li>
+        <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking.deepsort">videoanalytics.pipeline.sinks.object_tracking.deepsort</a>
+</li>
+        <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking.sort">videoanalytics.pipeline.sinks.object_tracking.sort</a>
 </li>
         <li><a href="roi.html#module-videoanalytics.pipeline.sinks.roi">videoanalytics.pipeline.sinks.roi</a>
-</li>
-        <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.trackers.sort">videoanalytics.pipeline.sinks.trackers.sort</a>
-</li>
-        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.yolo4_detector">videoanalytics.pipeline.sinks.yolo4_detector</a>
 </li>
         <li><a href="sources.html#module-videoanalytics.pipeline.sources">videoanalytics.pipeline.sources</a>
 </li>
@@ -325,22 +338,14 @@
   </ul></td>
 </tr></table>
 
-<h2 id="N">N</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pipeline.html#videoanalytics.pipeline.Sink.name">name (videoanalytics.pipeline.Sink attribute)</a>
-
-      <ul>
-        <li><a href="pipeline.html#videoanalytics.pipeline.Source.name">(videoanalytics.pipeline.Source attribute)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.ObjectDetectorCSV">ObjectDetectorCSV (class in videoanalytics.pipeline.sinks.obj_detector)</a>
+      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV">ObjectDetectorCSV (class in videoanalytics.pipeline.sinks.object_detection)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pipeline.html#videoanalytics.pipeline.Pipeline.optimize">optimize() (videoanalytics.pipeline.Pipeline method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -348,7 +353,11 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.predict">predict() (videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker method)</a>
+      <li><a href="pipeline.html#videoanalytics.pipeline.Pipeline">Pipeline (class in videoanalytics.pipeline)</a>
+</li>
+      <li><a href="pipeline.html#videoanalytics.pipeline.Pipeline.plot">plot() (videoanalytics.pipeline.Pipeline method)</a>
+</li>
+      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.utils.plot_predictions_vs_ground_truth">plot_predictions_vs_ground_truth() (in module videoanalytics.pipeline.sinks.object_detection.utils)</a>
 </li>
       <li><a href="pipeline.html#videoanalytics.pipeline.Sink.process">process() (videoanalytics.pipeline.Sink method)</a>
 
@@ -357,21 +366,29 @@
 </li>
         <li><a href="background.html#videoanalytics.pipeline.sinks.background.BackgroundExtractor2.process">(videoanalytics.pipeline.sinks.background.BackgroundExtractor2 method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.DetectionsAnnotator.process">(videoanalytics.pipeline.sinks.obj_detector.DetectionsAnnotator method)</a>
+        <li><a href="sinks.html#videoanalytics.pipeline.sinks.ImageWriter.process">(videoanalytics.pipeline.sinks.ImageWriter method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.DetectionsCSVWriter.process">(videoanalytics.pipeline.sinks.obj_detector.DetectionsCSVWriter method)</a>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.process">(videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.ObjectDetectorCSV.process">(videoanalytics.pipeline.sinks.obj_detector.ObjectDetectorCSV method)</a>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.process">(videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter method)</a>
+</li>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.process">(videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV method)</a>
+</li>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.process">(videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.process">(videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.sort.SORT.process">(videoanalytics.pipeline.sinks.object_tracking.sort.SORT method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.process">(videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.process">(videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter method)</a>
 </li>
         <li><a href="roi.html#videoanalytics.pipeline.sinks.roi.ROIObjTest.process">(videoanalytics.pipeline.sinks.roi.ROIObjTest method)</a>
 </li>
         <li><a href="roi.html#videoanalytics.pipeline.sinks.roi.ROIView.process">(videoanalytics.pipeline.sinks.roi.ROIView method)</a>
 </li>
-        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.SORT.process">(videoanalytics.pipeline.sinks.trackers.sort.SORT method)</a>
-</li>
         <li><a href="sinks.html#videoanalytics.pipeline.sinks.VideoWriter.process">(videoanalytics.pipeline.sinks.VideoWriter method)</a>
-</li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector.process">(videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -383,6 +400,8 @@
       <li><a href="pipeline.html#videoanalytics.pipeline.Source.read">read() (videoanalytics.pipeline.Source method)</a>
 
       <ul>
+        <li><a href="sources.html#videoanalytics.pipeline.sources.ImageSequenceReader.read">(videoanalytics.pipeline.sources.ImageSequenceReader method)</a>
+</li>
         <li><a href="sources.html#videoanalytics.pipeline.sources.VideoReader.read">(videoanalytics.pipeline.sources.VideoReader method)</a>
 </li>
       </ul></li>
@@ -407,23 +426,33 @@
 </li>
         <li><a href="background.html#videoanalytics.pipeline.sinks.background.BackgroundExtractor2.setup">(videoanalytics.pipeline.sinks.background.BackgroundExtractor2 method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.DetectionsAnnotator.setup">(videoanalytics.pipeline.sinks.obj_detector.DetectionsAnnotator method)</a>
+        <li><a href="sinks.html#videoanalytics.pipeline.sinks.ImageWriter.setup">(videoanalytics.pipeline.sinks.ImageWriter method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.DetectionsCSVWriter.setup">(videoanalytics.pipeline.sinks.obj_detector.DetectionsCSVWriter method)</a>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.setup">(videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.ObjectDetectorCSV.setup">(videoanalytics.pipeline.sinks.obj_detector.ObjectDetectorCSV method)</a>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.setup">(videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter method)</a>
+</li>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.setup">(videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV method)</a>
+</li>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.setup">(videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.setup">(videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.sort.SORT.setup">(videoanalytics.pipeline.sinks.object_tracking.sort.SORT method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.setup">(videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.setup">(videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter method)</a>
 </li>
         <li><a href="roi.html#videoanalytics.pipeline.sinks.roi.ROIObjTest.setup">(videoanalytics.pipeline.sinks.roi.ROIObjTest method)</a>
 </li>
         <li><a href="roi.html#videoanalytics.pipeline.sinks.roi.ROIView.setup">(videoanalytics.pipeline.sinks.roi.ROIView method)</a>
 </li>
-        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.SORT.setup">(videoanalytics.pipeline.sinks.trackers.sort.SORT method)</a>
-</li>
         <li><a href="sinks.html#videoanalytics.pipeline.sinks.VideoWriter.setup">(videoanalytics.pipeline.sinks.VideoWriter method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector.setup">(videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector method)</a>
-</li>
         <li><a href="pipeline.html#videoanalytics.pipeline.Source.setup">(videoanalytics.pipeline.Source method)</a>
+</li>
+        <li><a href="sources.html#videoanalytics.pipeline.sources.ImageSequenceReader.setup">(videoanalytics.pipeline.sources.ImageSequenceReader method)</a>
 </li>
         <li><a href="sources.html#videoanalytics.pipeline.sources.VideoReader.setup">(videoanalytics.pipeline.sources.VideoReader method)</a>
 </li>
@@ -435,23 +464,33 @@
 </li>
         <li><a href="background.html#videoanalytics.pipeline.sinks.background.BackgroundExtractor2.shutdown">(videoanalytics.pipeline.sinks.background.BackgroundExtractor2 method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.DetectionsAnnotator.shutdown">(videoanalytics.pipeline.sinks.obj_detector.DetectionsAnnotator method)</a>
+        <li><a href="sinks.html#videoanalytics.pipeline.sinks.ImageWriter.shutdown">(videoanalytics.pipeline.sinks.ImageWriter method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.DetectionsCSVWriter.shutdown">(videoanalytics.pipeline.sinks.obj_detector.DetectionsCSVWriter method)</a>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.shutdown">(videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.obj_detector.ObjectDetectorCSV.shutdown">(videoanalytics.pipeline.sinks.obj_detector.ObjectDetectorCSV method)</a>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.shutdown">(videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter method)</a>
+</li>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.shutdown">(videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV method)</a>
+</li>
+        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.shutdown">(videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.shutdown">(videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.sort.SORT.shutdown">(videoanalytics.pipeline.sinks.object_tracking.sort.SORT method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.shutdown">(videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator method)</a>
+</li>
+        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.shutdown">(videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter method)</a>
 </li>
         <li><a href="roi.html#videoanalytics.pipeline.sinks.roi.ROIObjTest.shutdown">(videoanalytics.pipeline.sinks.roi.ROIObjTest method)</a>
 </li>
         <li><a href="roi.html#videoanalytics.pipeline.sinks.roi.ROIView.shutdown">(videoanalytics.pipeline.sinks.roi.ROIView method)</a>
 </li>
-        <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.SORT.shutdown">(videoanalytics.pipeline.sinks.trackers.sort.SORT method)</a>
-</li>
         <li><a href="sinks.html#videoanalytics.pipeline.sinks.VideoWriter.shutdown">(videoanalytics.pipeline.sinks.VideoWriter method)</a>
 </li>
-        <li><a href="object_detection.html#videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector.shutdown">(videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector method)</a>
-</li>
         <li><a href="pipeline.html#videoanalytics.pipeline.Source.shutdown">(videoanalytics.pipeline.Source method)</a>
+</li>
+        <li><a href="sources.html#videoanalytics.pipeline.sources.ImageSequenceReader.shutdown">(videoanalytics.pipeline.sources.ImageSequenceReader method)</a>
 </li>
         <li><a href="sources.html#videoanalytics.pipeline.sources.VideoReader.shutdown">(videoanalytics.pipeline.sources.VideoReader method)</a>
 </li>
@@ -460,7 +499,9 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pipeline.html#videoanalytics.pipeline.Sink">Sink (class in videoanalytics.pipeline)</a>
 </li>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.SORT">SORT (class in videoanalytics.pipeline.sinks.trackers.sort)</a>
+      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.sort.SORT">SORT (class in videoanalytics.pipeline.sinks.object_tracking.sort)</a>
+</li>
+      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.sort.Sort">Sort (class in videoanalytics.pipeline.sinks.object_tracking.sort)</a>
 </li>
       <li><a href="pipeline.html#videoanalytics.pipeline.Source">Source (class in videoanalytics.pipeline)</a>
 </li>
@@ -473,12 +514,18 @@
       <li><a href="pipeline.html#videoanalytics.pipeline.Sink.toggle_display_enable">toggle_display_enable() (videoanalytics.pipeline.Sink method)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator">TrackedObjectsAnnotator (class in videoanalytics.pipeline.sinks.object_tracking)</a>
+</li>
+      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter">TrackedObjectsCSVWriter (class in videoanalytics.pipeline.sinks.object_tracking)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.update">update() (videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker method)</a>
+      <li><a href="object_tracking.html#videoanalytics.pipeline.sinks.object_tracking.sort.Sort.update">update() (videoanalytics.pipeline.sinks.object_tracking.sort.Sort method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -508,10 +555,54 @@
 </li>
       </ul></li>
       <li>
-    videoanalytics.pipeline.sinks.obj_detector
+    videoanalytics.pipeline.sinks.object_detection
 
       <ul>
-        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.obj_detector">module</a>
+        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection">module</a>
+</li>
+      </ul></li>
+      <li>
+    videoanalytics.pipeline.sinks.object_detection.evaluation
+
+      <ul>
+        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.evaluation">module</a>
+</li>
+      </ul></li>
+      <li>
+    videoanalytics.pipeline.sinks.object_detection.utils
+
+      <ul>
+        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    videoanalytics.pipeline.sinks.object_detection.yolo4
+
+      <ul>
+        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.yolo4">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    videoanalytics.pipeline.sinks.object_tracking
+
+      <ul>
+        <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking">module</a>
+</li>
+      </ul></li>
+      <li>
+    videoanalytics.pipeline.sinks.object_tracking.deepsort
+
+      <ul>
+        <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking.deepsort">module</a>
+</li>
+      </ul></li>
+      <li>
+    videoanalytics.pipeline.sinks.object_tracking.sort
+
+      <ul>
+        <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking.sort">module</a>
 </li>
       </ul></li>
       <li>
@@ -519,22 +610,6 @@
 
       <ul>
         <li><a href="roi.html#module-videoanalytics.pipeline.sinks.roi">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    videoanalytics.pipeline.sinks.trackers.sort
-
-      <ul>
-        <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.trackers.sort">module</a>
-</li>
-      </ul></li>
-      <li>
-    videoanalytics.pipeline.sinks.yolo4_detector
-
-      <ul>
-        <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.yolo4_detector">module</a>
 </li>
       </ul></li>
       <li>
@@ -561,7 +636,7 @@
 <h2 id="Y">Y</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.yolo4_detector.YOLOv4Detector">YOLOv4Detector (class in videoanalytics.pipeline.sinks.yolo4_detector)</a>
+      <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF">YOLOv4DetectorTF (class in videoanalytics.pipeline.sinks.object_detection.yolo4)</a>
 </li>
   </ul></td>
 </tr></table>

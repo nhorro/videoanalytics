@@ -26,10 +26,10 @@ Specific blocks that might require a more detailed discussion are treated in spe
    roi
    background
    utils
-   examples
    Basic pipeline.ipynb
    Image transformations.ipynb
    Object detection.ipynb   
+   Object tracking.ipynb   
    references   
 
 Indices and tables

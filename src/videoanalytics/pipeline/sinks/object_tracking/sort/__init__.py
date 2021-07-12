@@ -3,9 +3,12 @@
 """
 Implementation of SORT tracking algorithm.
 
-Note: the code included in this module is only a wrapper class for the 
-[original author code](https://github.com/abewley/sort) with minor changes to 
-adjust documentation format or minor refactoring.
+.. admonition:: Note
+
+    The code included in this module is only a wrapper class for the
+    `original paper's code <https://github.com/abewley/sort>`__
+    with minor changes to adjust documentation format or minor refactoring.
+
 """
 
 import numpy as np
@@ -62,8 +65,18 @@ def associate_detections_to_trackers(detections,trackers,iou_threshold = 0.3):
     return matches, np.array(unmatched_detections), np.array(unmatched_trackers)         
 
 
-class Sort(object):
-    
+class Sort(object):    
+    '''
+    SORT algorithm implementation.
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        max_age (int): age limit for a tracklet without being updated before removing it.
+        min_hits (int): minimum hits required to start a new track.
+        iou_threshold (float): minimum IoU to consider overlapping boxes.
+    '''
+
     def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3):
         """
         Sets key parameters for SORT
@@ -76,11 +89,17 @@ class Sort(object):
 
     def update(self, dets=np.empty((0, 5))):
         """
-        Params:
-        dets - a numpy array of detections in the format [[x1,y1,x2,y2,score],[x1,y1,x2,y2,score],...]
-        Requires: this method must be called once for each frame even with empty detections (use np.empty((0, 5)) for frames without detections).
-        Returns the a similar array, where the last column is the object ID.
-        NOTE: The number of objects returned may differ from the number of detections provided.
+        Updates the internal state of the tracked objects. 
+        This method must be called once for each frame even with empty detections (use np.empty((0, 5)) 
+        for frames without detections).
+
+        Args:
+            dets - a numpy array of detections in the format [[x1,y1,x2,y2,score],[x1,y1,x2,y2,score],...]
+            
+        Returns 
+            A similar array, where the last column is the object ID.
+        
+        Note: The number of objects returned may differ from the number of detections provided.
         """
         self.frame_count += 1
         
@@ -124,6 +143,35 @@ class Sort(object):
 
 
 class SORT(Sink):
+    '''
+    Wrapper class for the SORT algorithm.
+
+    This component **READS** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | DETECTIONS        | Output of an object detection model.                |
+    +-------------------+-----------------------------------------------------+
+    | START_FRAME       | Initial frame index.                                |
+    +-------------------+-----------------------------------------------------+
+
+    This component **WRITES** the following entries in the global context:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | TRACKED_OBJS      | Object trackings.                                   |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        max_age (int): age limit for a tracklet without being updated before removing it.
+        min_hits (int): minimum hits required to start a new track.
+        iou_threshold (float): minimum IoU to consider overlapping boxes.
+    '''
+
     def __init__(self, name, context, max_age=1, min_hits=3, iou_threshold=0.3):
         super().__init__(name, context)
         self.relative_frame_counter = 0            

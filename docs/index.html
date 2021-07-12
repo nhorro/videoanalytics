@@ -35,6 +35,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -97,7 +98,10 @@
 <li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic%20pipeline.html">A basic pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Image%20transformations.html">Image transformation pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
 </ul>
 
@@ -166,7 +170,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="documentation-for-videoanalytics">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="documentation-for-videoanalytics">
 <h1>Documentation for videoanalytics<a class="headerlink" href="#documentation-for-videoanalytics" title="Permalink to this headline">¶</a></h1>
 <p>This project’s documentation is organized in two parts. The first part comprises and <a class="reference internal" href="intro.html"><span class="doc">Introduction</span></a>
 section that describes the scope of the library follwed by a description of the pipeline paradigm
@@ -178,6 +206,7 @@ Specific blocks that might require a more detailed discussion are treated in spe
 <p class="caption"><span class="caption-text">Contents</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#motivation">Motivation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#what-is-video-analytics">What is video analytics?</a></li>
 </ul>
 </li>
@@ -197,27 +226,69 @@ Specific blocks that might require a more detailed discussion are treated in spe
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="object_detection.html">Object detection</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="object_detection.html#module-videoanalytics.pipeline.sinks.obj_detector">API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="object_detection.html#format-conventions">Format conventions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.yolo4">YOLOv4 implementation in tensorflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.utils">Utilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.evaluation">Detection performance evaluation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="object_tracking.html">Object tracking</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="object_tracking.html#api-reference">API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking.sort">SORT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking.deepsort">DeepSORT</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="roi.html#module-videoanalytics.pipeline.sinks.roi">API reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi.html#api-reference">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="roi.html#json-format-for-definition-of-polygonal-regions">JSON format for definition of polygonal regions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="background.html#videoanalytics-pipeline-sinks-background">videoanalytics.pipeline.sinks.background</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#module-videoanalytics.utils">API reference</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="devnotes.html#notes-for-development-and-dependency-management">Notes for development and dependency management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic%20pipeline.html">A basic pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Basic%20pipeline.html#Typical-workflow">Typical workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Image%20transformations.html">Image transformation pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Object%20detection.html#A-minimal-object-detection-pipeline">A minimal object detection pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Object%20detection.html#Configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Object%20detection.html#Input-and-output-video">Input and output video</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Object%20detection.html#Configuration-of-object-detection-components">Configuration of object detection components</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Object%20detection.html#Pipeline-instantiation-and-execution">Pipeline instantiation and execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Object%20detection.html#Evaluation-of-execution-time">Evaluation of execution time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Object%20detection.html#Exploration-of-results">Exploration of results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Object%20detection.html#A-pipeline-for-evaluation-of-results-(frame-by-frame-evaluation)">A pipeline for evaluation of results (frame-by-frame evaluation)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Object%20detection.html#id1">Pipeline instantiation and execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Object%20detection.html#Evaluation-of-results">Evaluation of results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Object%20detection.html#Model-selection">Model selection</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Object%20tracking.html#Object-tracking-pipeline-with-SORT-algorithm">Object tracking pipeline with SORT algorithm</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Object%20tracking.html#Exploration-of-results">Exploration of results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Object%20tracking.html#Object-tracking-pipeline-with-DeepSORT-algorithm">Object tracking pipeline with DeepSORT algorithm</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Object%20tracking.html#id1">Exploration of results</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>

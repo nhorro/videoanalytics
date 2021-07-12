@@ -35,6 +35,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,12 +96,9 @@
 <li class="toctree-l1"><a class="reference internal" href="sinks.html">Sinks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="object_detection.html">Object detection</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Object tracking</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#api-reference">API reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.trackers.sort">SORT</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#videoanalytics-pipeline-sinks-trackers-sort">videoanalytics.pipeline.sinks.trackers.sort</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#deepsort">DeepSORT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.object_tracking">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.object_tracking.sort">SORT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.object_tracking.deepsort">DeepSORT</a></li>
 </ul>
 </li>
 </ul>
@@ -108,7 +106,10 @@
 <li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="devnotes.html">Development notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Basic%20pipeline.html">A basic pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Image%20transformations.html">Image transformation pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
 </ul>
 
@@ -177,103 +178,395 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="object-tracking">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="object-tracking">
 <h1>Object tracking<a class="headerlink" href="#object-tracking" title="Permalink to this headline">¶</a></h1>
 <p>Object trackers use information from object detectors to track the position and velocity of
 unique objects in a scene.</p>
-<div class="section" id="api-reference">
-<h2>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="module-videoanalytics.pipeline.sinks.trackers.sort">
-<span id="sort"></span><h3>SORT<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.trackers.sort" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="videoanalytics-pipeline-sinks-trackers-sort">
-<h4>videoanalytics.pipeline.sinks.trackers.sort<a class="headerlink" href="#videoanalytics-pipeline-sinks-trackers-sort" title="Permalink to this headline">¶</a></h4>
-<p>Implementation of SORT tracking algorithm.</p>
+<div class="section" id="module-videoanalytics.pipeline.sinks.object_tracking">
+<span id="api-reference"></span><h2>API reference<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.object_tracking" title="Permalink to this headline">¶</a></h2>
+<p>This module contains generic components for tracking algorithms.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.trackers.sort.</span></span><span class="sig-name descname"><span class="pre">KalmanBoxTracker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class represents the internal state of individual tracked objects observed as bbox.</p>
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_tracking.</span></span><span class="sig-name descname"><span class="pre">TrackedObjectsAnnotator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates the tracked objects in a frame displaying a bounding box around each
+identified object with its numeric Id.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>TRACKED_OBJS</p></td>
+<td colspan="3"><p>Output of an object tracker.</p></td>
+</tr>
+<tr class="row-odd"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>WRITES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialises a tracker using initial bounding box.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.get_state">
-<span class="sig-name descname"><span class="pre">get_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.get_state" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the current bounding box estimate.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Advances the state vector and returns the predicted bounding box estimate.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.KalmanBoxTracker.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates the state vector with observed bbox.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.SORT">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.trackers.sort.</span></span><span class="sig-name descname"><span class="pre">SORT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_hits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.SORT" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.SORT.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.SORT.process" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method is called for each active component in the pipeline.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.SORT.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.SORT.setup" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method is called after all components from the pipeline are instanced.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.SORT.shutdown">
-<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.SORT.shutdown" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsAnnotator.shutdown" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method is called after the process finished.</p>
 </dd></dl>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_tracking.</span></span><span class="sig-name descname"><span class="pre">TrackedObjectsCSVWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the trackings to a CSV file.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>TRACKED_OBJS</p></td>
+<td colspan="3"><p>Output of an object tracker.</p></td>
+</tr>
+<tr class="row-odd"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – CSV output file.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.TrackedObjectsCSVWriter.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="module-videoanalytics.pipeline.sinks.object_tracking.sort">
+<span id="sort"></span><h3>SORT<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.object_tracking.sort" title="Permalink to this headline">¶</a></h3>
+<p>Implementation of SORT tracking algorithm.</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>The code included in this module is only a wrapper class for the
+<a class="reference external" href="https://github.com/abewley/sort">original paper’s code</a>
+with minor changes to adjust documentation format or minor refactoring.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.sort.SORT">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_tracking.sort.</span></span><span class="sig-name descname"><span class="pre">SORT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_hits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.sort.SORT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper class for the SORT algorithm.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DETECTIONS</p></td>
+<td colspan="3"><p>Output of an object detection model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>START_FRAME</p></td>
+<td colspan="3"><p>Initial frame index.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>WRITES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>TRACKED_OBJS</p></td>
+<td colspan="3"><p>Object trackings.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>max_age</strong> (<em>int</em>) – age limit for a tracklet without being updated before removing it.</p></li>
+<li><p><strong>min_hits</strong> (<em>int</em>) – minimum hits required to start a new track.</p></li>
+<li><p><strong>iou_threshold</strong> (<em>float</em>) – minimum IoU to consider overlapping boxes.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.sort.SORT.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.sort.SORT.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.sort.SORT.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.sort.SORT.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.sort.SORT.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.sort.SORT.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.sort.Sort">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_tracking.sort.</span></span><span class="sig-name descname"><span class="pre">Sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_hits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.sort.Sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>SORT algorithm implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>max_age</strong> (<em>int</em>) – age limit for a tracklet without being updated before removing it.</p></li>
+<li><p><strong>min_hits</strong> (<em>int</em>) – minimum hits required to start a new track.</p></li>
+<li><p><strong>iou_threshold</strong> (<em>float</em>) – minimum IoU to consider overlapping boxes.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.sort.Sort.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_hits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.sort.Sort.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets key parameters for SORT</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.sort.Sort.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([],</span> <span class="pre">shape=(0,</span> <span class="pre">5),</span> <span class="pre">dtype=float64)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.sort.Sort.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the internal state of the tracked objects.
+This method must be called once for each frame even with empty detections (use np.empty((0, 5))
+for frames without detections).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>- a numpy array of detections in the format</strong><strong> [</strong><strong>[</strong><strong>x1</strong> (<em>dets</em>) – </p></li>
+<li><p><strong>y1</strong> – </p></li>
+<li><p><strong>x2</strong> – </p></li>
+<li><p><strong>y2</strong> – </p></li>
+<li><p><strong>score</strong><strong>]</strong> – </p></li>
+<li><p><strong>[</strong><strong>x1</strong> – </p></li>
+<li><p><strong>y1</strong> – </p></li>
+<li><p><strong>x2</strong> – </p></li>
+<li><p><strong>y2</strong> – </p></li>
+<li><p><strong>score</strong><strong>]</strong> – </p></li>
+<li><p><strong>...</strong><strong>]</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns</dt><dd><p>A similar array, where the last column is the object ID.</p>
+</dd>
+</dl>
+<p>Note: The number of objects returned may differ from the number of detections provided.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.associate_detections_to_trackers">
-<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.trackers.sort.</span></span><span class="sig-name descname"><span class="pre">associate_detections_to_trackers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trackers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.associate_detections_to_trackers" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.sort.associate_detections_to_trackers">
+<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_tracking.sort.</span></span><span class="sig-name descname"><span class="pre">associate_detections_to_trackers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trackers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.sort.associate_detections_to_trackers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assigns detections to tracked object (both represented as bounding boxes)
 Returns 3 lists of matches, unmatched_detections and unmatched_trackers</p>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.convert_bbox_to_z">
-<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.trackers.sort.</span></span><span class="sig-name descname"><span class="pre">convert_bbox_to_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.convert_bbox_to_z" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes a bounding box in the form [x1,y1,x2,y2] and returns z in the form
-[x,y,s,r] where x,y is the centre of the box and s is the scale/area and r is
-the aspect ratio</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.convert_x_to_bbox">
-<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.trackers.sort.</span></span><span class="sig-name descname"><span class="pre">convert_x_to_bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.convert_x_to_bbox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Takes a bounding box in the centre form [x,y,s,r] and returns it in the form
-[x1,y1,x2,y2] where x1,y1 is the top left and x2,y2 is the bottom right</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.trackers.sort.iou_batch">
-<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.trackers.sort.</span></span><span class="sig-name descname"><span class="pre">iou_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bb_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bb_gt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.trackers.sort.iou_batch" title="Permalink to this definition">¶</a></dt>
-<dd><p>From SORT: Computes IOU between two bboxes in the form [x1,y1,x2,y2]</p>
-</dd></dl>
-
 </div>
+<div class="section" id="module-videoanalytics.pipeline.sinks.object_tracking.deepsort">
+<span id="deepsort"></span><h3>DeepSORT<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.object_tracking.deepsort" title="Permalink to this headline">¶</a></h3>
+<p>Implementation of DeepSORT tracking algorithm.</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>The code included in this module is only a wrapper class for the
+<a class="reference external" href="https://github.com/nwojke/deep_sort/">original paper’s code</a>
+with minor changes to adjust documentation format or minor refactoring.</p>
 </div>
-<div class="section" id="deepsort">
-<h3>DeepSORT<a class="headerlink" href="#deepsort" title="Permalink to this headline">¶</a></h3>
-<p>WIP</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_tracking.deepsort.</span></span><span class="sig-name descname"><span class="pre">DeepSORT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper class for the DeepSORT algorithm.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DETECTIONS</p></td>
+<td colspan="3"><p>Output of an object detection model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>START_FRAME</p></td>
+<td colspan="3"><p>Initial frame index.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>WRITES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>TRACKED_OBJS</p></td>
+<td colspan="3"><p>Object trackings.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>model_filename</strong> (<em>str</em>) – filename for the reidentification model.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_tracking.deepsort.DeepSORT.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 </div>

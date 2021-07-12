@@ -2,8 +2,22 @@ import numpy as np
 import pandas as pd
 from mean_average_precision import MetricBuilder
 
+"""
+This module contains utilities for evaluation of object detection models using mAP.
+"""
+
 def evaluate_object_detection_predictions(df_gt_dets, df_pred_dets, classes,model_name):
     """ Evaluate the predictions returned by an object detection model.
+  
+    Args:        
+        df_gt_dets(pandas.DataFrame): ground truth detections as returned by 
+            :meth:`videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list`.
+        df_pred_dets(pandas.DataFrame): predictions.
+        classes(list): list of class indexes to evaluate.
+        model_name(str): model name to use in the returned dataframe.
+
+    Returns:
+        - A dataframe containing the results.
     """
     metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=len(classes))
 

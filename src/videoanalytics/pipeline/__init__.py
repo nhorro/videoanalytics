@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Base classes for the pipeline paradigm.
+This module contains the base classes for the pipeline paradigm.
 """
 
 from abc import ABC, abstractmethod
@@ -20,11 +20,14 @@ else:
 
 
 class Source(ABC): 
-    name = ""
-    
     """
-    A source.
+    Abstract class for a source component.
     """ 
+
+    """
+    Name. Used as an unique identifier to refer to the component in the pipeline.
+    """ 
+    name = ""
     def __init__(self, name:str, context:dict):
         """ Default constructor.
         """
@@ -56,11 +59,15 @@ class Source(ABC):
         pass    
 
 class Sink(ABC):
-    name = ""
+    """
+    Abstract class for a sink component.
+    """     
 
     """
-    A sink.
+    Name. Used as an unique identifier to refer to the component in the pipeline.
     """ 
+    name = ""
+
     def __init__(self, name:str, context:dict):
         """ Default constructor.
         """
@@ -99,6 +106,10 @@ class Sink(ABC):
         pass            
 
 class Pipeline:
+    """
+    Class that represents a configuration of components in a pipeline.
+    """     
+
     logger = logging.getLogger(__name__)
 
     def __init__(self):
@@ -118,7 +129,7 @@ class Pipeline:
 
     def optimize(self):
         """
-        Remove isolated blocks, if any
+        Optimizing the pipeline consistis in removing isolated blocks from the graph.
         """
         self.dag.remove_nodes_from(list(nx.isolates(self.dag)))
         self.optimized = True
@@ -196,6 +207,10 @@ class Pipeline:
         return self.total_elapsed_time
 
     def plot(self,ax):
+        """ Plot the pipeline graph.
+
+        Note: currently only matplotlib is supported.
+        """
         #nx.draw_networkx(self.dag, 
         #    pos=nx.spring_layout(self.dag), with_labels=True, font_weight='bold')
         #plt.show()

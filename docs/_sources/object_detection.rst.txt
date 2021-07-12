@@ -12,12 +12,26 @@ port of the Darknet YOLOv4 model or any of its variants.
 The consumption or object detection as a service through gRPC or other protocol is also an
 implementation alternative, that could reduce the dependencies for videoanalytics library.
 
-
 API reference
 -------------
 
-.. automodule:: videoanalytics.pipeline.sinks.obj_detector
+.. automodule:: videoanalytics.pipeline.sinks.object_detection
    :members:
 
-.. automodule:: videoanalytics.pipeline.sinks.yolo4_detector
+YOLOv4 implementation in tensorflow
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: videoanalytics.pipeline.sinks.object_detection.yolo4
+   :members:   
+
+Utilities
+^^^^^^^^^
+
+.. automodule:: videoanalytics.pipeline.sinks.object_detection.utils
+   :members:
+
+Detection performance evaluation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: videoanalytics.pipeline.sinks.object_detection.evaluation
    :members:   

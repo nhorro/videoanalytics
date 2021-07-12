@@ -20,4 +20,5 @@ SORT
 DeepSORT
 ^^^^^^^^
 
-WIP
+.. automodule:: videoanalytics.pipeline.sinks.object_tracking.deepsort
+   :members:   
