@@ -32,6 +32,7 @@ Specific blocks that might require a more detailed discussion are treated in spe
    Image transformations.ipynb
    Object detection.ipynb   
    Object tracking.ipynb   
+   Integration with databases.ipynb
    references   
 
 Indices and tables

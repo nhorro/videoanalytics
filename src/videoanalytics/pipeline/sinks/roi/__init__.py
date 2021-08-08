@@ -13,7 +13,6 @@ import pandas as pd
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
-
 from videoanalytics.pipeline import Sink
 import json
 
