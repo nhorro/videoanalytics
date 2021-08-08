@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Object tracking pipeline &mdash; videoanalytics 0.0.2 documentation</title>
+  <title>Integration with databases &mdash; videoanalytics 0.0.2 documentation</title>
   
 
   
@@ -44,8 +44,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Integration with databases" href="Integration%20with%20databases.html" />
-    <link rel="prev" title="Object detection pipeline" href="Object%20detection.html" /> 
+    <link rel="next" title="References and useful resources" href="references.html" />
+    <link rel="prev" title="Object tracking pipeline" href="Object%20tracking.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -106,18 +106,18 @@
 <li class="toctree-l1"><a class="reference internal" href="Basic%20pipeline.html">A basic pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Image%20transformations.html">Image transformation pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Object tracking pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#Object-tracking-pipeline-with-SORT-algorithm">Object tracking pipeline with SORT algorithm</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Integration with databases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Integration-with-InfluxDB">Integration with InfluxDB</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Exploration-of-results">Exploration of results</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#Object-tracking-pipeline-with-DeepSORT-algorithm">Object tracking pipeline with DeepSORT algorithm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Integration-with-ElasticSearch">Integration with ElasticSearch</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Exploration of results</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Integration%20with%20databases.html">Integration with databases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
 </ul>
 
@@ -167,13 +167,13 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Object tracking pipeline</li>
+      <li>Integration with databases</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/Object tracking.nblink.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/Integration with databases.nblink.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -456,13 +456,13 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
-<div class="section" id="Object-tracking-pipeline">
-<h1>Object tracking pipeline<a class="headerlink" href="#Object-tracking-pipeline" title="Permalink to this headline">¶</a></h1>
-<p>This example shows a basic pipeline that performs object tracking.</p>
+<div class="section" id="Integration-with-databases">
+<h1>Integration with databases<a class="headerlink" href="#Integration-with-databases" title="Permalink to this headline">¶</a></h1>
+<p>This example shows how to store the results of a pipeline to a database.</p>
 <p>Contents:</p>
 <ul class="simple">
-<li><p>Object tracking pipeline with SORT algorithm.</p></li>
-<li><p>Object tracking pipeline with DeepSORT algorithm.</p></li>
+<li><p>Integration with InfluxDB (time series).</p></li>
+<li><p>Integration with ElasticSearch (structured documents).</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -495,7 +495,7 @@ div.rendered_html tbody tr:hover {
 
 <span class="c1"># Input</span>
 <span class="n">INPUT_VIDEO</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;/input/test_video.mp4&quot;</span>
-<span class="n">START_FRAME</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">START_FRAME</span> <span class="o">=</span> <span class="mi">8000</span>
 <span class="n">MAX_FRAMES</span> <span class="o">=</span> <span class="mi">100</span>
 </pre></div>
 </div>
@@ -534,9 +534,13 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>Object tracking requires that objects are identified in each individual frame. To perform this task the same components of the object detection examples will be used in the pipeline.</p>
+<p>We will be storing the detections for each frame in two formats:</p>
+<ul class="simple">
+<li><p>Object count of each class per frame as a time series (InfluxDB).</p></li>
+<li><p>Each detection as a record (ElasticSearch).</p></li>
+</ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -547,7 +551,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -566,22 +570,20 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="section" id="Object-tracking-pipeline-with-SORT-algorithm">
-<h2>Object tracking pipeline with SORT algorithm<a class="headerlink" href="#Object-tracking-pipeline-with-SORT-algorithm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Integration-with-InfluxDB">
+<h2>Integration with InfluxDB<a class="headerlink" href="#Integration-with-InfluxDB" title="Permalink to this headline">¶</a></h2>
+<p>Two components are introduced: - <code class="docutils literal notranslate"><span class="pre">DetectionsCounter</span></code>: creates a variable named <code class="docutils literal notranslate"><span class="pre">&lt;PREFIX&gt;&lt;CLASS_ID&gt;&lt;POSTFIX&gt;</span></code> in the context with the number of instances for each class for each frame. (<code class="docutils literal notranslate"><span class="pre">&lt;PREFIX&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;POSTFIX&gt;</span></code> are parameters). - <code class="docutils literal notranslate"><span class="pre">InfluxDBWriter</span></code>: writes the specified variables to InfluxDB.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_tracking</span> <span class="kn">import</span> <span class="n">TrackedObjectsAnnotator</span><span class="p">,</span> <span class="n">TrackedObjectsCSVWriter</span>
-<span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_tracking.sort</span> <span class="kn">import</span> <span class="n">SORT</span>
-
-<span class="n">TRACKED_OBJS_FILENAME</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;/output/trackings.csv&quot;</span>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.database.influxdb</span> <span class="kn">import</span> <span class="n">InfluxDBWriter</span><span class="p">,</span> <span class="n">DetectionsCounter</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -602,38 +604,45 @@ div.rendered_html tbody tr:hover {
 <span class="c1"># 3.2 Detector</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">YOLOv4DetectorTF</span><span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">weights_filename</span><span class="o">=</span><span class="n">DETECTOR_WEIGHTS_FILENAME</span><span class="p">)</span> <span class="p">)</span>
 
-<span class="c1"># 3.3 Tracker (SORT)</span>
-<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">SORT</span><span class="p">(</span><span class="s2">&quot;tracker&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">)</span> <span class="p">)</span>
+<span class="c1"># 3.3 Detector to variable list</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DetectionsCounter</span><span class="p">(</span><span class="s2">&quot;detcounter&quot;</span><span class="p">,</span>
+                                          <span class="n">context</span><span class="p">,</span>
+                                          <span class="n">classes_to_count</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                          <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;OBJ_&quot;</span><span class="p">,</span>
+                                          <span class="n">postfix</span><span class="o">=</span><span class="s2">&quot;_COUNT&quot;</span><span class="p">)</span> <span class="p">)</span>
 
-<span class="c1"># 3.4 Annotate tracked objects in output video</span>
-<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">TrackedObjectsAnnotator</span><span class="p">(</span><span class="s2">&quot;tracker_annotator&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">)</span> <span class="p">)</span>
+<span class="c1"># 3.4 InfluxDB</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">InfluxDBWriter</span><span class="p">(</span><span class="s2">&quot;influxdb&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span>
+                                        <span class="n">variables_to_publish</span><span class="o">=</span><span class="p">[</span>
+                                            <span class="s2">&quot;OBJ_00_COUNT&quot;</span>
+                                        <span class="p">],</span>
+                                        <span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+                                        <span class="n">port</span><span class="o">=</span><span class="mi">8086</span><span class="p">,</span>
+                                        <span class="n">database</span><span class="o">=</span><span class="s2">&quot;my_application&quot;</span><span class="p">,</span>
+                                        <span class="n">reset_db</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="p">)</span>
 
-<span class="c1"># 3.5 Save trackings to CSV for posterior anayisis</span>
-<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">TrackedObjectsCSVWriter</span><span class="p">(</span><span class="s2">&quot;tracker_csv_writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">TRACKED_OBJS_FILENAME</span><span class="p">)</span> <span class="p">)</span>
-
-<span class="c1"># 3.6 Output video</span>
+<span class="c1"># 3.5 Output video</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">VideoWriter</span><span class="p">(</span><span class="s2">&quot;writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="n">OUTPUT_VIDEO</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># 4. Define connections</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">set_connections</span><span class="p">([</span>
     <span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;detector&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;tracker&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;tracker&quot;</span><span class="p">,</span> <span class="s2">&quot;tracker_annotator&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;tracker&quot;</span><span class="p">,</span> <span class="s2">&quot;tracker_csv_writer&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;tracker_annotator&quot;</span><span class="p">,</span> <span class="s2">&quot;writer&quot;</span><span class="p">)</span>
+    <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;detcounter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;detcounter&quot;</span><span class="p">,</span> <span class="s2">&quot;influxdb&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;influxdb&quot;</span><span class="p">,</span> <span class="s2">&quot;writer&quot;</span><span class="p">)</span>
 <span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -642,7 +651,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -657,11 +666,11 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/Object_tracking_15_0.png" src="_images/Object_tracking_15_0.png" />
+<img alt="_images/Integration_with_databases_15_0.png" src="_images/Integration_with_databases_15_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -675,18 +684,18 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4fda216103fc420fbe97d3eb65940c5d", "version_major": 2, "version_minor": 0}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ac4c1d68667242168d881c6bb0543a1c", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Total execution time [s]: 60.35206350700173
+Total execution time [s]: 66.61873008300608
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -699,7 +708,7 @@ Total execution time [s]: 60.35206350700173
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -727,27 +736,23 @@ Total execution time [s]: 60.35206350700173
   <tbody>
     <tr>
       <th>input_avg_dt</th>
-      <td>0.009327</td>
+      <td>0.011074</td>
     </tr>
     <tr>
       <th>detector_avg_dt</th>
-      <td>0.559688</td>
+      <td>0.518353</td>
     </tr>
     <tr>
-      <th>tracker_avg_dt</th>
-      <td>0.000865</td>
+      <th>detcounter_avg_dt</th>
+      <td>0.000013</td>
     </tr>
     <tr>
-      <th>tracker_csv_writer_avg_dt</th>
-      <td>0.000018</td>
-    </tr>
-    <tr>
-      <th>tracker_annotator_avg_dt</th>
-      <td>0.000330</td>
+      <th>influxdb_avg_dt</th>
+      <td>0.087228</td>
     </tr>
     <tr>
       <th>writer_avg_dt</th>
-      <td>0.030823</td>
+      <td>0.045736</td>
     </tr>
   </tbody>
 </table>
@@ -755,145 +760,68 @@ Total execution time [s]: 60.35206350700173
 </div>
 <div class="section" id="Exploration-of-results">
 <h3>Exploration of results<a class="headerlink" href="#Exploration-of-results" title="Permalink to this headline">¶</a></h3>
-<p>Display the output video with annotated bounding boxes.</p>
-<p>Note: currently XVID format is not supported by jupyter.</p>
+<p>Statistics can be of interest to focus on frame from video that contain interesting events. This can also be performed with the CSV output, but storing the results in DB is the prefered method if scalability is a concern.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">%%HTML</span>
-<span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;text-align: center&quot;</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">video</span> <span class="na">width</span><span class="o">=</span><span class="s">&quot;600&quot;</span> <span class="na">height</span><span class="o">=</span><span class="s">&quot;400&quot;</span> <span class="na">controls</span><span class="p">&gt;</span>
-      <span class="p">&lt;</span><span class="nt">source</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;../data/output/test_output.avi&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;video/mp4&quot;</span><span class="p">&gt;</span>
-    <span class="p">&lt;/</span><span class="nt">video</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.database.influxdb</span> <span class="kn">import</span> <span class="n">plot_timeseries</span>
+<span class="kn">from</span> <span class="nn">influxdb</span> <span class="kn">import</span> <span class="n">InfluxDBClient</span>
+
+<span class="n">INFLUXDB_HOSTNAME</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<span class="n">INFLUXDB_USERNAME</span><span class="o">=</span><span class="s2">&quot;root&quot;</span>
+<span class="n">INFLUXDB_PASSWORD</span><span class="o">=</span><span class="s2">&quot;root&quot;</span>
+<span class="n">INFLUXDB_SCHEMA</span><span class="o">=</span><span class="s2">&quot;my_application&quot;</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">InfluxDBClient</span><span class="p">(</span> <span class="n">INFLUXDB_HOSTNAME</span><span class="p">,</span> <span class="mi">8086</span><span class="p">,</span> <span class="n">INFLUXDB_USERNAME</span><span class="p">,</span> <span class="n">INFLUXDB_PASSWORD</span><span class="p">,</span> <span class="n">INFLUXDB_SCHEMA</span><span class="p">)</span>
+
+<span class="n">variable_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;OBJ_00_COUNT&quot;</span>
+<span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">plot_timeseries</span><span class="p">(</span> <span class="n">client</span><span class="p">,</span> <span class="n">variable_list</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span><span class="n">index_mode</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Object count per class&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area rendered_html docutils container">
-<div style="text-align: center">
-    <video width="600" height="400" controls>
-      <source src="../data/output/test_output.avi" type="video/mp4">
-    </video>
-</div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_tracks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">TRACKED_OBJS_FILENAME</span><span class="p">,</span>
-                        <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;frame_num&quot;</span><span class="p">,</span><span class="s2">&quot;obj_id&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="s2">&quot;h&quot;</span><span class="p">])</span>
-<span class="n">df_tracks</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
-</pre></div>
-</div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>frame_num</th>
-      <th>obj_id</th>
-      <th>x</th>
-      <th>y</th>
-      <th>w</th>
-      <th>h</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>2</td>
-      <td>696</td>
-      <td>387</td>
-      <td>111</td>
-      <td>104</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0</td>
-      <td>1</td>
-      <td>860</td>
-      <td>361</td>
-      <td>140</td>
-      <td>137</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>2</td>
-      <td>696</td>
-      <td>387</td>
-      <td>111</td>
-      <td>104</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>1</td>
-      <td>860</td>
-      <td>361</td>
-      <td>140</td>
-      <td>137</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>2</td>
-      <td>2</td>
-      <td>696</td>
-      <td>387</td>
-      <td>108</td>
-      <td>102</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
+<div class="output_area docutils container">
+<img alt="_images/Integration_with_databases_19_0.png" src="_images/Integration_with_databases_19_0.png" />
 </div>
 </div>
 </div>
-<div class="section" id="Object-tracking-pipeline-with-DeepSORT-algorithm">
-<h2>Object tracking pipeline with DeepSORT algorithm<a class="headerlink" href="#Object-tracking-pipeline-with-DeepSORT-algorithm" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="Integration-with-ElasticSearch">
+<h2>Integration with ElasticSearch<a class="headerlink" href="#Integration-with-ElasticSearch" title="Permalink to this headline">¶</a></h2>
+<p>ElasticSearch is a Database designed for fast insertion and query of JSON documents. A typical application is to store events. In this case, a component is dedicated to store the detections in one step: <code class="docutils literal notranslate"><span class="pre">DetectionsESWriter</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">DEEPSORT_MODEL_FILENAME</span> <span class="o">=</span> <span class="n">DATA_PATH</span><span class="o">+</span><span class="s2">&quot;object_tracking/mars-small128.pb&quot;</span>
+<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.database.elasticsearch</span> <span class="kn">import</span> <span class="n">DetectionsESWriter</span>
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">videoanalytics.pipeline.sinks.object_tracking.deepsort</span> <span class="kn">import</span> <span class="n">DeepSORT</span>
-
-<span class="c1"># 1. Create the global context</span>
+<span></span><span class="n">ELASTICSEARCH_HOSTNAME</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<span class="n">ELASTICSEARCH_INDEX</span><span class="o">=</span><span class="s2">&quot;detections&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 1. Create the global context</span>
 <span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
 
 <span class="c1"># 2. Create the pipeline</span>
@@ -910,53 +838,83 @@ Total execution time [s]: 60.35206350700173
 <span class="c1"># 3.2 Detector</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">YOLOv4DetectorTF</span><span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">weights_filename</span><span class="o">=</span><span class="n">DETECTOR_WEIGHTS_FILENAME</span><span class="p">)</span> <span class="p">)</span>
 
-<span class="c1"># 3.3 Tracker (DeepSORT)</span>
-<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DeepSORT</span><span class="p">(</span><span class="s2">&quot;tracker&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">model_filename</span><span class="o">=</span><span class="n">DEEPSORT_MODEL_FILENAME</span><span class="p">)</span> <span class="p">)</span>
-<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">TrackedObjectsAnnotator</span><span class="p">(</span><span class="s2">&quot;tracker_annotator&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">)</span> <span class="p">)</span>
+<span class="c1"># 3.3 Detections writer</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span> <span class="n">DetectionsESWriter</span><span class="p">(</span><span class="s2">&quot;eswriter&quot;</span><span class="p">,</span>
+                                           <span class="n">context</span><span class="p">,</span>
+                                           <span class="n">hostname</span><span class="o">=</span><span class="n">ELASTICSEARCH_HOSTNAME</span><span class="p">,</span>
+                                           <span class="n">es_index</span><span class="o">=</span><span class="n">ELASTICSEARCH_INDEX</span><span class="p">)</span> <span class="p">)</span>
 
-<span class="c1"># 3.3 Sink</span>
+<span class="c1"># 3.6 Output video</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">VideoWriter</span><span class="p">(</span><span class="s2">&quot;writer&quot;</span><span class="p">,</span><span class="n">context</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="n">OUTPUT_VIDEO</span><span class="p">))</span>
-
-<span class="c1"># 4. Define connections</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 4. Define connections</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">set_connections</span><span class="p">([</span>
     <span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;detector&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;tracker&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;tracker&quot;</span><span class="p">,</span> <span class="s2">&quot;tracker_annotator&quot;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;tracker_annotator&quot;</span><span class="p">,</span> <span class="s2">&quot;writer&quot;</span><span class="p">)</span>
+    <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;eswriter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;eswriter&quot;</span><span class="p">,</span> <span class="s2">&quot;writer&quot;</span><span class="p">)</span>
 <span class="p">])</span>
-
-<span class="c1"># 5. Execute</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pipeline</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span><span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/Integration_with_databases_26_0.png" src="_images/Integration_with_databases_26_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># 5. Execute</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total execution time [s]:&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_total_execution_time</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "64c88b2f155042ee81541acd64b8e333", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Total execution time [s]: 75.83832986899506
-</pre></div></div>
-</div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">metrics_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time [s]&quot;</span><span class="p">])</span>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># 6. Report (optional)</span>
+<span class="n">metrics_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time [s]&quot;</span><span class="p">])</span>
 <span class="n">metrics_df</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
@@ -984,23 +942,19 @@ Total execution time [s]: 75.83832986899506
   <tbody>
     <tr>
       <th>input_avg_dt</th>
-      <td>0.007867</td>
+      <td>0.011698</td>
     </tr>
     <tr>
       <th>detector_avg_dt</th>
-      <td>0.692927</td>
+      <td>0.525466</td>
     </tr>
     <tr>
-      <th>tracker_avg_dt</th>
-      <td>0.024441</td>
-    </tr>
-    <tr>
-      <th>tracker_annotator_avg_dt</th>
-      <td>0.000456</td>
+      <th>eswriter_avg_dt</th>
+      <td>0.132491</td>
     </tr>
     <tr>
       <th>writer_avg_dt</th>
-      <td>0.030239</td>
+      <td>0.048645</td>
     </tr>
   </tbody>
 </table>
@@ -1008,97 +962,49 @@ Total execution time [s]: 75.83832986899506
 </div>
 <div class="section" id="id1">
 <h3>Exploration of results<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Advanced queries allow the identification of interesting sections of footage. Elasticsearch supports a query language with a similar syntax to SQL.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_tracks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">TRACKED_OBJS_FILENAME</span><span class="p">,</span>
-                        <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;frame_num&quot;</span><span class="p">,</span><span class="s2">&quot;obj_id&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="s2">&quot;h&quot;</span><span class="p">])</span>
-<span class="n">df_tracks</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span></span><span class="kn">from</span> <span class="nn">elasticsearch</span> <span class="kn">import</span> <span class="n">Elasticsearch</span>
+
+<span class="n">es</span> <span class="o">=</span> <span class="n">Elasticsearch</span><span class="p">(</span><span class="n">ELASTICSEARCH_HOSTNAME</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">ELASTICSEARCH_INDEX</span><span class="p">,</span>
+                <span class="n">body</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match_all&quot;</span><span class="p">:</span> <span class="p">{</span>
+
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Got </span><span class="si">%d</span><span class="s2"> Hits:&quot;</span> <span class="o">%</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;hits&#39;</span><span class="p">][</span><span class="s1">&#39;total&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;hits&#39;</span><span class="p">][</span><span class="s1">&#39;hits&#39;</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(timestamp)s</span><span class="s2"> Frame </span><span class="si">%(frame)s</span><span class="s2"> Class </span><span class="si">%(class_idx)s</span><span class="s2"> score: </span><span class="si">%(score)s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">hit</span><span class="p">[</span><span class="s2">&quot;_source&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
-<div class="output_area rendered_html docutils container">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>frame_num</th>
-      <th>obj_id</th>
-      <th>x</th>
-      <th>y</th>
-      <th>w</th>
-      <th>h</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>2</td>
-      <td>696</td>
-      <td>387</td>
-      <td>111</td>
-      <td>104</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0</td>
-      <td>1</td>
-      <td>860</td>
-      <td>361</td>
-      <td>140</td>
-      <td>137</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>2</td>
-      <td>696</td>
-      <td>387</td>
-      <td>111</td>
-      <td>104</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>1</td>
-      <td>860</td>
-      <td>361</td>
-      <td>140</td>
-      <td>137</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>2</td>
-      <td>2</td>
-      <td>696</td>
-      <td>387</td>
-      <td>108</td>
-      <td>102</td>
-    </tr>
-  </tbody>
-</table>
-</div></div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Got 140 Hits:
+2021-08-08T00:41:19.856067 Frame 8000 Class 0 score: 0.7429153323173523
+2021-08-08T00:45:36.575191 Frame 8000 Class 0 score: 0.7429153323173523
+2021-08-08T00:45:36.575191 Frame 8000 Class 0 score: 0.6205215454101562
+2021-08-08T00:45:37.735088 Frame 8001 Class 0 score: 0.7429153323173523
+2021-08-08T00:45:37.735088 Frame 8001 Class 0 score: 0.6205215454101562
+2021-08-08T00:45:38.620463 Frame 8002 Class 0 score: 0.6578598618507385
+2021-08-08T00:45:38.620463 Frame 8002 Class 0 score: 0.633901059627533
+2021-08-08T00:45:39.363828 Frame 8003 Class 0 score: 0.6384348273277283
+2021-08-08T00:45:39.363828 Frame 8003 Class 0 score: 0.5262541174888611
+2021-08-08T00:45:40.171607 Frame 8004 Class 0 score: 0.6390221118927002
+</pre></div></div>
 </div>
 </div>
 </div>
@@ -1110,8 +1016,8 @@ Total execution time [s]: 75.83832986899506
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="Integration%20with%20databases.html" class="btn btn-neutral float-right" title="Integration with databases" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="Object%20detection.html" class="btn btn-neutral float-left" title="Object detection pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="references.html" class="btn btn-neutral float-right" title="References and useful resources" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Object%20tracking.html" class="btn btn-neutral float-left" title="Object tracking pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

@@ -96,11 +96,14 @@
 <li class="toctree-l1"><a class="reference internal" href="object_tracking.html">Object tracking</a></li>
 <li class="toctree-l1"><a class="reference internal" href="roi.html">Working with ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background.html">Background substraction and motion estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Integration with databases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zeromq.html">Communication with ZeroMQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Basic%20pipeline.html">A basic pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Image%20transformations.html">Image transformation pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Integration%20with%20databases.html">Integration with databases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
 </ul>
 
@@ -189,6 +192,7 @@
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
  
 </div>
 <h2 id="_">_</h2>
@@ -314,6 +318,8 @@
 </li>
         <li><a href="background.html#module-videoanalytics.pipeline.sinks.background">videoanalytics.pipeline.sinks.background</a>
 </li>
+        <li><a href="database.html#module-videoanalytics.pipeline.sinks.database">videoanalytics.pipeline.sinks.database</a>
+</li>
         <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection">videoanalytics.pipeline.sinks.object_detection</a>
 </li>
         <li><a href="object_detection.html#module-videoanalytics.pipeline.sinks.object_detection.evaluation">videoanalytics.pipeline.sinks.object_detection.evaluation</a>
@@ -329,6 +335,8 @@
         <li><a href="object_tracking.html#module-videoanalytics.pipeline.sinks.object_tracking.sort">videoanalytics.pipeline.sinks.object_tracking.sort</a>
 </li>
         <li><a href="roi.html#module-videoanalytics.pipeline.sinks.roi">videoanalytics.pipeline.sinks.roi</a>
+</li>
+        <li><a href="zeromq.html#module-videoanalytics.pipeline.sinks.zmq">videoanalytics.pipeline.sinks.zmq</a>
 </li>
         <li><a href="sources.html#module-videoanalytics.pipeline.sources">videoanalytics.pipeline.sources</a>
 </li>
@@ -390,6 +398,8 @@
 </li>
         <li><a href="sinks.html#videoanalytics.pipeline.sinks.VideoWriter.process">(videoanalytics.pipeline.sinks.VideoWriter method)</a>
 </li>
+        <li><a href="zeromq.html#videoanalytics.pipeline.sinks.zmq.ZMQPub.process">(videoanalytics.pipeline.sinks.zmq.ZMQPub method)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -450,6 +460,8 @@
 </li>
         <li><a href="sinks.html#videoanalytics.pipeline.sinks.VideoWriter.setup">(videoanalytics.pipeline.sinks.VideoWriter method)</a>
 </li>
+        <li><a href="zeromq.html#videoanalytics.pipeline.sinks.zmq.ZMQPub.setup">(videoanalytics.pipeline.sinks.zmq.ZMQPub method)</a>
+</li>
         <li><a href="pipeline.html#videoanalytics.pipeline.Source.setup">(videoanalytics.pipeline.Source method)</a>
 </li>
         <li><a href="sources.html#videoanalytics.pipeline.sources.ImageSequenceReader.setup">(videoanalytics.pipeline.sources.ImageSequenceReader method)</a>
@@ -487,6 +499,8 @@
         <li><a href="roi.html#videoanalytics.pipeline.sinks.roi.ROIView.shutdown">(videoanalytics.pipeline.sinks.roi.ROIView method)</a>
 </li>
         <li><a href="sinks.html#videoanalytics.pipeline.sinks.VideoWriter.shutdown">(videoanalytics.pipeline.sinks.VideoWriter method)</a>
+</li>
+        <li><a href="zeromq.html#videoanalytics.pipeline.sinks.zmq.ZMQPub.shutdown">(videoanalytics.pipeline.sinks.zmq.ZMQPub method)</a>
 </li>
         <li><a href="pipeline.html#videoanalytics.pipeline.Source.shutdown">(videoanalytics.pipeline.Source method)</a>
 </li>
@@ -555,6 +569,13 @@
 </li>
       </ul></li>
       <li>
+    videoanalytics.pipeline.sinks.database
+
+      <ul>
+        <li><a href="database.html#module-videoanalytics.pipeline.sinks.database">module</a>
+</li>
+      </ul></li>
+      <li>
     videoanalytics.pipeline.sinks.object_detection
 
       <ul>
@@ -613,6 +634,13 @@
 </li>
       </ul></li>
       <li>
+    videoanalytics.pipeline.sinks.zmq
+
+      <ul>
+        <li><a href="zeromq.html#module-videoanalytics.pipeline.sinks.zmq">module</a>
+</li>
+      </ul></li>
+      <li>
     videoanalytics.pipeline.sources
 
       <ul>
@@ -637,6 +665,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="object_detection.html#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF">YOLOv4DetectorTF (class in videoanalytics.pipeline.sinks.object_detection.yolo4)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="zeromq.html#videoanalytics.pipeline.sinks.zmq.ZMQPub">ZMQPub (class in videoanalytics.pipeline.sinks.zmq)</a>
 </li>
   </ul></td>
 </tr></table>
