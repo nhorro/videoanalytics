@@ -75,8 +75,9 @@ class DetectionsAnnotator(Sink):
         context (dict): The global context. 
         class_names_filename (str): text file with class names.
         show_label (bool): display class name in bounding box.
+        context_name(str): name of the variable in the context containing detections.
     '''
-    def __init__(self, name, context, class_names_filename,show_label=True):
+    def __init__(self, name, context, class_names_filename,context_name="DETECTIONS",show_label=True):
         super().__init__(name, context)
         self.class_names = read_class_names(class_names_filename)
         self.show_label = show_label
@@ -92,11 +93,13 @@ class DetectionsAnnotator(Sink):
 
         self.frame_counter=0     
         
+        self.context_name = context_name
+        
     def setup(self):        
         pass
             
     def process(self):           
-        out_boxes, out_scores, out_classes, num_boxes = self.context["DETECTIONS"]
+        out_boxes, out_scores, out_classes, num_boxes = self.context[self.context_name]
         image_h, image_w, _ = self.context["FRAME"].shape
         for i in range(num_boxes):
             if int(out_classes[i]) < 0 or int(out_classes[i]) > self.num_classes: continue
@@ -150,18 +153,20 @@ class DetectionsCSVWriter(Sink):
         context (dict): The global context. 
         filename (str): CSV output file.
         show_label (bool): display class name in bounding box.
+        context_name(str): name of the variable in the context containing detections.
     '''
-    def __init__(self, name, context,filename):
+    def __init__(self, name, context,filename,context_name="DETECTIONS"):
         super().__init__(name, context)
         self.csv_file = open(filename, mode='w')
         self.csv_writer = csv.writer(self.csv_file, delimiter=',', quotechar='"', 
                                      quoting=csv.QUOTE_MINIMAL)
+        self.context_name=context_name
         
     def setup(self):                
         self.frame_counter = self.context["START_FRAME"]
             
     def process(self):        
-        out_boxes, out_scores, out_classes, num_boxes = self.context["DETECTIONS"]
+        out_boxes, out_scores, out_classes, num_boxes = self.context[self.context_name]
         for i in range(num_boxes):
             x,y,w,h = out_boxes[i]            
             score = out_scores[i]
@@ -207,18 +212,20 @@ class ObjectDetectorCSV(Sink):
         context (dict): The global context. 
         class_names_filename (str): text file with class names.
         show_label (bool): display class name in bounding box.
+        context_name(str): name of the variable in the context containing detections.
     '''   
-    def __init__(self, context,filename):
+    def __init__(self, context,filename, context_name="DETECTIONS"):
         super().__init__(context)
         
         det_columns = ["frame_num","class_idx", "x","y","w","h","score","filename"]        
         self.df = pd.read_csv(filename,names=det_columns)
+        self.context_name = context_name
                 
     def setup(self):        
         self.frame_counter = self.context["START_FRAME"]
             
     def process(self):        
-        self.context["DETECTIONS"] = []
+        self.context[self.context_name] = []
         out_boxes = []
         out_scores = []
         out_classes = []
@@ -228,7 +235,7 @@ class ObjectDetectorCSV(Sink):
             out_scores.append(r[1].score)
             out_classes.append(r[1].class_idx)
             
-        self.context["DETECTIONS"] = [out_boxes, out_scores, out_classes, len(out_boxes)]
+        self.context[self.context_name] = [out_boxes, out_scores, out_classes, len(out_boxes)]
         self.frame_counter+=1
     
     def shutdown(self):

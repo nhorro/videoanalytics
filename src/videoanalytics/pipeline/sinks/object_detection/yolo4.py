@@ -38,21 +38,23 @@ class YOLOv4DetectorTF(Sink):
         weights_filename (str): model weights filename. 
         allowed_classes (list): set of allowed classes. This option is to restrict
                                 the detections to a subset of classes relevant to
-                                the application domain.
+                                the application domain. If None, all classes are allowed.
         yolo_input_size (int): size in pixels of the input cell. The input image is 
                                resized using opencv. 
         yolo_max_output_size_per_class (int): maximum number of detections per class.
         yolo_max_total_size (int): maximum number of detections.
         yolo_iou_threshold (float): minimum IoU to accept detection.
         yolo_score_threshold (float): minimum score to accept detected class as valid.
+        context_name(str): variable name used for storing detections in context
     '''
     def __init__(self,name,context,weights_filename,
-                 allowed_classes = [0],
+                 allowed_classes = None,
                  yolo_input_size = 416,
                  yolo_max_output_size_per_class=50,
                  yolo_max_total_size=50,
                  yolo_iou_threshold=0.45,
-                 yolo_score_threshold=0.40):
+                 yolo_score_threshold=0.40,
+                 context_name="DETECTIONS"):
         super().__init__(name, context)
         
         self.allowed_classes = np.array(allowed_classes)
@@ -62,6 +64,8 @@ class YOLOv4DetectorTF(Sink):
         self.yolo_max_total_size=yolo_max_total_size
         self.yolo_iou_threshold=yolo_iou_threshold
         self.yolo_score_threshold=yolo_score_threshold
+        
+        self.context_name = context_name
         
         self.saved_model_loaded = tf.saved_model.load(weights_filename, tags=[tag_constants.SERVING])
         self.infer = self.saved_model_loaded.signatures['serving_default']
@@ -104,18 +108,19 @@ class YOLOv4DetectorTF(Sink):
         classes = classes[0:int(num_objects)]
         
         # 5. Filtrar clases que no interesan
-        remove_idx = np.argwhere(~np.isin(classes,self.allowed_classes))
-        bboxes = np.delete(bboxes, remove_idx, axis=0)
-        scores = np.delete(scores, remove_idx, axis=0)
-        classes = np.delete(classes, remove_idx, axis=0)
-        num_objects = len(bboxes)
+        if self.allowed_classes:
+            remove_idx = np.argwhere(~np.isin(classes,self.allowed_classes))
+            bboxes = np.delete(bboxes, remove_idx, axis=0)
+            scores = np.delete(scores, remove_idx, axis=0)
+            classes = np.delete(classes, remove_idx, axis=0)
+            num_objects = len(bboxes)
         
         # 6. Convertir BBs de normalized ymin, xmin, ymax, xmax ---> xmin, ymin, width, height
         original_h, original_w, _ = self.context["FRAME"].shape
         bboxes = format_boxes(bboxes, original_h, original_w)
 
         # 7. FIXME: encontrar una forma mejor de representar las detecciones
-        self.context["DETECTIONS"] = [bboxes, scores, classes, num_objects]
+        self.context[self.context_name] = [bboxes, scores, classes, num_objects]
     
     def shutdown(self):
         pass  
