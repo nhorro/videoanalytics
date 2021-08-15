@@ -44,7 +44,7 @@ class TrackedObjectsAnnotator(Sink):
         pass
         
     def process(self):
-        fontScale = 1.0
+        fontScale = 0.4
         image_h, image_w, _ = self.context["FRAME"].shape
         bbox_color = (155,200,200)
         for d in self.context["TRACKED_OBJS"]:
