@@ -40,24 +40,25 @@ class ROIView(Sink):
         name(str): the component unique name.
         context (dict): The global context. 
         filename (str): name of JSON file containing region definitions.
+        alpha(float): transparency factor (0=invisible,1=opaque).
 
     (*) The entry contains a list of dicitonaries with following elements:
         - polygon: numpy array containing polygon definition
         - color: color to represent the polygon in the video.
     
     '''         
-    def __init__(self, name, context,filename):
+    def __init__(self, name, context,filename,alpha=0.2):
         super().__init__(name, context)
 
         with open(filename) as f:
             self.rois = json.load(f)
 
         self.rois = self.rois["regions"]
+        self.alpha = alpha
 
         for i,v in enumerate(self.rois):
             self.rois[i]["polygon"] = np.int32([self.rois[i]["polygon"]])
-            #print(self.rois[i]["polygon"])
-   
+            
     def setup(self):        
         self.frame_counter = self.context["START_FRAME"]
             
@@ -65,20 +66,17 @@ class ROIView(Sink):
         if self.display_enabled:
             overlay = self.context["FRAME"].copy()
 
-            alpha = 0.2  # Transparency factor.
-            # Following line overlays transparent rectangle over the image
-            
             for r in self.rois:
                 cv2.fillPoly(overlay, pts = r["polygon"] , color = r["color"])
                 cv2.polylines(overlay, r["polygon"] , 5, r["color"])
-            self.context["FRAME"] = cv2.addWeighted(overlay, alpha, self.context["FRAME"], 1 - alpha, 0)            
+            self.context["FRAME"] = cv2.addWeighted(overlay, self.alpha, self.context["FRAME"], 1 - self.alpha, 0)            
         self.frame_counter+=1
     
     def shutdown(self):
         pass   
 
 
-class ROIObjTest(Sink):        
+class ROIPresenceCounter(Sink):        
     '''
     Component for testing the presence of detected objects in ROIs.
 
@@ -114,9 +112,8 @@ class ROIObjTest(Sink):
         with open(filename) as f:
             self.rois = json.load(f)
 
-        print(self.rois)
+        #print(self.rois)
         self.rois = self.rois["regions"]
-
 
         for r in self.rois:
             r["activity"] = 0.
@@ -145,8 +142,8 @@ class ROIObjTest(Sink):
                     #print("Objeto adentro de {}".format(r["name"]))
                     r["activity"] += 1
 
-                # Publicar variable
-                self.context["q_{}".format(r["name"])]=r["activity"] 
+            # Publicar variable
+            self.context["q_{}".format(r["name"])]=r["activity"] 
             q_total+=r["activity"] 
 
             #if r["activity"] > 0:
@@ -157,3 +154,5 @@ class ROIObjTest(Sink):
     
     def shutdown(self):
         pass   
+
+
