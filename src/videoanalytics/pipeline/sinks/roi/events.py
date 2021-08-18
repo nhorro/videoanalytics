@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 from videoanalytics.pipeline import Sink
 import json
+import csv
 
 
 class ROIEventsGenerator:
