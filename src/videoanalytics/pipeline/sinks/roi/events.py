@@ -128,11 +128,8 @@ class ROIEventsGenerator:
       axes.plot(*v.exterior.xy,color="g") 
 
     # Plot line segments
-    for x in self.segments:
-      axes.plot(x[0], y[0], 'bo', linestyle="--")
-      #axes.text(point1[0]-0.015, point1[1]+0.25, "Point1")
-      #axes.text(point2[0]-0.050, point2[1]-0.25, "Point2")
-
+    # FIXME
+    
     # Plot tracked obj
     for x,v in self.tracked_objs.items():
       axes.scatter(*v.xy,color="r") 

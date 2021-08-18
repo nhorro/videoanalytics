@@ -33,6 +33,7 @@ Specific blocks that might require a more detailed discussion are treated in spe
    Object detection.ipynb   
    Object tracking.ipynb   
    Integration with databases.ipynb
+   Events and statistics from ROIs.ipynb
    references   
 
 Indices and tables
