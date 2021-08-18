@@ -35,8 +35,11 @@ class InfluxDBWriter(Sink):
     Args:        
         name(str): the component unique name.
         context (dict): The global context. 
-        class_names_filename (str): text file with class names.
-        show_label (bool): display class name in bounding box.
+        variables_to_publish(list): List of variables to publish.
+        host(str): InfluxDB hostname.
+        port(int): InfluxDB port.
+        database(str): InfluxDB database name.
+        reset_db(bool): clear database before starting (useful for quick tests).
     '''
     def __init__(self, name, context, variables_to_publish, 
                                 host='localhost', 

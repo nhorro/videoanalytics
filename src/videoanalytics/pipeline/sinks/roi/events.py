@@ -9,10 +9,12 @@ from shapely.geometry import Point, Polygon, LineString, GeometryCollection
 import numpy as np
 import matplotlib.pyplot as plt
 
+from videoanalytics.pipeline import Sink
+import json
 
 
-class ROIEvents:
-  def __init__(self,screen_width,screen_height):
+class ROIEventsGenerator:
+  def __init__(self,screen_width,screen_height,user_callback=None):
     self.screen_width = screen_width
     self.screen_height = screen_height
 
@@ -37,7 +39,10 @@ class ROIEvents:
     # Dictionary of sets containing objects inside each ROI
     self.objs_inside_rois = {}
 
-    self.user_callback = self.__default_user_callback
+    if user_callback == None:
+      self.user_callback = self.__default_user_callback 
+    else:
+      self.user_callback = user_callback 
 
   def add_roi(self,name,r):
     """ Add a ROI.
@@ -134,3 +139,166 @@ class ROIEvents:
 
     axes.grid(which="Both")
     return axes
+
+
+
+class ROIEvents(Sink):
+    '''
+    Registers ROI events in the shared context.
+
+    This component **READS** the following entries:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | START_FRAME       | Initial frame.                                      |
+    +-------------------+-----------------------------------------------------+
+    | TRACKED_OBJS      | Positions of identified objects.                    |
+    +-------------------+-----------------------------------------------------+
+    | INPUT_WIDTH       | Image width (regions are defined in absolute pixel  |
+    |                   | coordinates).                                       |
+    +-------------------+-----------------------------------------------------+
+    | INPUT_HEIGHT      | Image width (regions are defined in absolute pixel  |
+    |                   | coordinates).                                       |
+    +-------------------+-----------------------------------------------------+
+        
+    This component **WRITES** the following entries:
+    
+    +-----------------------+-----------------------------------------------------+
+    | Variable name         | Description                                         |
+    +=======================+============+==========+=============================+
+    | EVENTS_ENTERED_SCREEN | Object IDs that entered the screen region.          |
+    +-----------------------+-----------------------------------------------------+
+    | EVENTS_LEFT_SCREEN    | Object IDs that left the screen region.             |
+    +-----------------------+-----------------------------------------------------+
+    | EVENTS_ENTERED_ROI    | Object IDs that entered ROIs.                       |
+    +-----------------------+-----------------------------------------------------+
+    | EVENTS_LEFT_ROI       | Object IDs that left ROIs.                          |
+    +-----------------------+-----------------------------------------------------+
+    
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        filename(str): CSV filename.
+    '''
+    def __init__(self, name, context,filename):
+        super().__init__(name, context)
+        self.verbose = False
+        with open(filename) as f:
+            self.rois = json.load(f)
+            
+        self.rois = self.rois["regions"]
+            
+        for i,v in enumerate(self.rois):
+            self.rois[i]["polygon"] = Polygon(self.rois[i]["polygon"])
+
+    def setup(self):                
+        self.frame_counter = self.context["START_FRAME"]
+        self.roi_eventgen = ROIEventsGenerator(
+            screen_width = self.context["INPUT_WIDTH"],
+            screen_height = self.context["INPUT_HEIGHT"],
+            user_callback=self.__update)
+        
+        for r in self.rois:
+            self.roi_eventgen.add_roi(r["name"],r["polygon"])
+            
+    def __update(self, entered_screen,left_screen, entered_roi, left_roi):
+        
+        self.context["EVENTS_ENTERED_SCREEN"] = entered_screen
+        self.context["EVENTS_LEFT_SCREEN"] = left_screen
+        self.context["EVENTS_ENTERED_ROI"] = entered_roi
+        self.context["EVENTS_LEFT_ROI"] = left_roi
+        
+        if self.verbose:
+            if len(entered_screen)>0:
+                for x in entered_screen:
+                    print("{} entered the screen".format(x))
+
+            if len(left_screen)>0:
+                for x in left_screen:
+                    print("{} left the screen".format(x))
+
+            for k_roi in entered_roi:
+                if len(entered_roi[k_roi])>0:
+                    print("Entered {} ".format(k_roi), entered_roi[k_roi])
+
+            for k_roi in left_roi:
+                if len(left_roi[k_roi])>0:
+                    print("Left {} ".format(k_roi), left_roi[k_roi])            
+
+    def process(self):                
+        tracked_objs = {x[0]:[x[1]+x[3]/2,x[2]+x[3]/2] for x in self.context["TRACKED_OBJS"] }
+        self.roi_eventgen.update_obj_positions(tracked_objs)
+        self.frame_counter+=1
+
+    def shutdown(self):               
+        pass
+    
+    
+
+class ROIEventsCSVWriter(Sink):
+    '''
+    Writes ROI events to CSV.
+
+    This component **READS** the following entries:
+
+    +-----------------------+-----------------------------------------------------+
+    | Variable name         | Description                                         |
+    +=======================+============+==========+=============================+
+    | START_FRAME           | Initial frame.                                      |
+    +-----------------------+-----------------------------------------------------+
+    | TRACKED_OBJS          | Positions of identified objects.                    |
+    +-----------------------+-----------------------------------------------------+
+    | EVENTS_ENTERED_SCREEN | Object IDs that entered the screen region.          |
+    +-----------------------+-----------------------------------------------------+
+    | EVENTS_LEFT_SCREEN    | Object IDs that left the screen region.             |
+    +-----------------------+-----------------------------------------------------+
+    | EVENTS_ENTERED_ROI    | Object IDs that entered ROIs.                       |
+    +-----------------------+-----------------------------------------------------+
+    | EVENTS_LEFT_ROI       | Object IDs that left ROIs.                          |
+    +-----------------------+-----------------------------------------------------+
+    
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        filename(str): CSV filename.
+    '''
+    def __init__(self, name, context,filename):
+        super().__init__(name, context)
+        self.verbose = False
+        self.csv_file = open(filename, mode='w')
+        self.csv_writer = csv.writer(self.csv_file, delimiter=',', quotechar='"', 
+                                     quoting=csv.QUOTE_MINIMAL)
+        self.csv_writer.writerow(["frame_num","event","obj_id","roi"])
+
+    def setup(self):                
+        self.frame_counter = self.context["START_FRAME"]
+            
+    def process(self):                
+        entered_screen = self.context["EVENTS_ENTERED_SCREEN"]
+        left_screen = self.context["EVENTS_LEFT_SCREEN"]
+        entered_roi = self.context["EVENTS_ENTERED_ROI"]
+        left_roi = self.context["EVENTS_LEFT_ROI"]
+        
+        if len(entered_screen)>0:
+            for obj_id in entered_screen:
+                self.csv_writer.writerow([self.frame_counter,"ENTERED",obj_id,"SCREEN"])
+
+        if len(left_screen)>0:
+            for obj_id in left_screen:
+                self.csv_writer.writerow([self.frame_counter,"LEFT",obj_id,"SCREEN"])
+
+        for k_roi in entered_roi:
+            if len(entered_roi[k_roi])>0:
+                for obj_id in entered_roi[k_roi]:
+                    self.csv_writer.writerow([self.frame_counter,"ENTERED",obj_id,k_roi])
+                
+        for k_roi in left_roi:
+            if len(left_roi[k_roi])>0:
+                for obj_id in left_roi[k_roi]:
+                    self.csv_writer.writerow([self.frame_counter,"LEFT",obj_id,k_roi])        
+        self.frame_counter+=1
+
+    def shutdown(self):        
+        self.csv_file.close()        
+        pass    

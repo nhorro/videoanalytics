@@ -68,12 +68,12 @@ class DeepSORT(Sink):
         self.frame_counter = self.context["START_FRAME"]
         
     def process(self):        
+        self.context["TRACKED_OBJS"] = []
         out_boxes, out_scores, out_classes, num_boxes = self.context["DETECTIONS"]
         if num_boxes>0:    
             # encode yolo detections and feed to tracker
             features = self.encoder (self.context["FRAME"], out_boxes)
             detections = [Detection(bbox, score, class_idx, feature) for bbox, score, class_idx, feature in zip(out_boxes, out_scores, out_classes, features)]
-            self.context["TRACKED_OBJS"] = []
         else:            
             detections = None
         

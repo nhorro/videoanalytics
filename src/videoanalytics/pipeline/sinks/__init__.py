@@ -7,6 +7,7 @@ import logging
 
 import cv2
 import numpy as np
+import csv
 
 from videoanalytics.pipeline import Sink
 
@@ -108,3 +109,48 @@ class ImageWriter(Sink):
     
     def shutdown(self):
         pass
+
+
+
+class VariableCSVWriter(Sink):
+    '''
+    Stores variables in a CSV.
+
+    This component **READS** the entries matching the variable names specified
+    in configurations, example "VARIABLE_1", etc.:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | VARIABLE_1        | Variable updated by some component.                 |
+    +-------------------+-----------------------------------------------------+
+    | VARIABLE_2        | Variable updated by some component.                 |
+    +-------------------+-----------------------------------------------------+
+    | ...               | ...                                                 |
+    +-------------------+-----------------------------------------------------+
+    | VARIABLE_N        | Variable updated by some component.                 |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+        filename(str): CSV filename.
+        variables_to_write(list): List of variables to write.
+    '''
+    def __init__(self, name, context,filename,variables_to_write):
+        super().__init__(name, context)
+        self.csv_file = open(filename, mode='w')
+        self.csv_writer = csv.writer(self.csv_file, delimiter=',', quotechar='"', 
+                                     quoting=csv.QUOTE_MINIMAL)
+        self.variables_to_write = variables_to_write
+        self.csv_writer.writerow(["frame_num"]+variables_to_write)
+
+    def setup(self):                
+        self.frame_counter = self.context["START_FRAME"]
+
+    def process(self):        
+        self.csv_writer.writerow([self.frame_counter]+[self.context[v] for v in self.variables_to_write])            
+        self.frame_counter+=1
+
+    def shutdown(self):        
+        self.csv_file.close()            

@@ -100,13 +100,14 @@ class ROIPresenceCounter(Sink):
         name(str): the component unique name.
         context (dict): The global context. 
         filename (str): name of JSON file containing region definitions.
+        context_name(str): name of the variable in the context containing the detections.
 
     (*) The entry contains a list of dictionaries containing:
         - polygon: numpy array containing polygon definition
         - color: color to represent the polygon in the video.
     
     '''   
-    def __init__(self, name, context,filename):
+    def __init__(self, name, context,filename, context_name="DETECTIONS"):
         super().__init__(name, context)
 
         with open(filename) as f:
@@ -121,12 +122,14 @@ class ROIPresenceCounter(Sink):
         for i,v in enumerate(self.rois):
             self.rois[i]["polygon_i32"] = np.int32([self.rois[i]["polygon"]])
             self.rois[i]["polygon"] = Polygon(self.rois[i]["polygon"])
+
+        self.context_name = context_name
    
     def setup(self):        
         self.frame_counter = self.context["START_FRAME"]
             
     def process(self):       
-        out_boxes, out_scores, out_classes, num_boxes = self.context["DETECTIONS"]
+        out_boxes, out_scores, out_classes, num_boxes = self.context[self.context_name]
         q_total = 0 
         for r in self.rois:
             r["activity"] = 0
