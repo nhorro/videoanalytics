@@ -36,6 +36,8 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,10 +97,11 @@
 <li class="toctree-l1"><a class="reference internal" href="sources.html">Sources</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sinks.html">Sinks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Object detection</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#api-reference">API reference</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#yolov4-implementation-in-tensorflow">YOLOv4 implementation in tensorflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#utilities">Utilities</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#detection-performance-evaluation">Detection performance evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.object_detection">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#format-conventions">Format conventions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.object_detection.yolo4">YOLOv4 implementation in tensorflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.object_detection.utils">Utilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-videoanalytics.pipeline.sinks.object_detection.evaluation">Detection performance evaluation</a></li>
 </ul>
 </li>
 </ul>
@@ -114,6 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Integration%20with%20databases.html">Integration with databases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Events%20and%20statistics%20from%20ROIs.html">Events and statistics from ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
 </ul>
 
@@ -217,16 +221,438 @@ Examples of specific implementation are a tensorflow, OpenCV or other deep learn
 port of the Darknet YOLOv4 model or any of its variants.
 The consumption or object detection as a service through gRPC or other protocol is also an
 implementation alternative, that could reduce the dependencies for videoanalytics library.</p>
-<div class="section" id="api-reference">
-<h2>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="yolov4-implementation-in-tensorflow">
-<h3>YOLOv4 implementation in tensorflow<a class="headerlink" href="#yolov4-implementation-in-tensorflow" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-videoanalytics.pipeline.sinks.object_detection">
+<span id="api-reference"></span><h2>API reference<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.object_detection" title="Permalink to this headline">¶</a></h2>
+<p>The main module contains classes and methods for tasks related with object detection.</p>
+<div class="section" id="format-conventions">
+<h3>Format conventions<a class="headerlink" href="#format-conventions" title="Permalink to this headline">¶</a></h3>
+<p>The are different conventions to represent bounding boxes, being some of them:</p>
+<ul class="simple">
+<li><p>Each bounding box is represented by its top left coordinates and width and height in absolute
+values (pixels). This is the most convenient format for extracting patches or annotating.</p></li>
+<li><p>Each bounding box is represented by its center coordinates and width and height in normalized values
+(0.0-1.0). This is the format used by YOLO.</p></li>
+</ul>
+<p>Modules <code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">evaluation</span></code> contain utilities for working with different formats.</p>
+<p>The adopted format for representing the detections in the global context is storing a tuple with
+the entry name “DETECTIONS” with the following components:</p>
+<ul class="simple">
+<li><p><em>out_boxes</em>: a list of boxes in absolute coordinates (top left, width, height, in pixels).</p></li>
+<li><p><em>out_scores</em>: a list of the scores (confidence) for each predicted box (0.0-1.0).</p></li>
+<li><p><em>out_classes</em>: a list of the class numeric identifier for each box (<span class="math notranslate nohighlight">\(0,...,n_{classes}-1\)</span>)</p></li>
+<li><p><em>num_boxes</em>: the size of the list</p></li>
+</ul>
+<p>The convention used for CSV format in components is to store the each detection as a row.
+The columns are:</p>
+<ul class="simple">
+<li><p><em>frame_num</em>: frame number, incremented from variable “START_FRAME” at iteration zero.</p></li>
+<li><p><em>class_idx</em>: numeric identifier of the detected class.</p></li>
+<li><p><em>x,y</em>: top left bounding box coordinate in pixels.</p></li>
+<li><p><em>w,h</em>: width and height of the bounding box in pixels.</p></li>
+<li><p><em>score</em>: confidence for the detection.</p></li>
+<li><p><em>filename (optional)</em>: this field is fulfilled with the “IMG_FILENAME” variable, if present in the context.</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_detection.</span></span><span class="sig-name descname"><span class="pre">DetectionsAnnotator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_names_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DETECTIONS'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotates the detections in a frame displaying a bounding box around each
+identified object.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DETECTIONS</p></td>
+<td colspan="3"><p>Output of an object detection model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>WRITES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>class_names_filename</strong> (<em>str</em>) – text file with class names.</p></li>
+<li><p><strong>show_label</strong> (<em>bool</em>) – display class name in bounding box.</p></li>
+<li><p><strong>context_name</strong> (<em>str</em>) – name of the variable in the context containing detections.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.DetectionsAnnotator.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_detection.</span></span><span class="sig-name descname"><span class="pre">DetectionsCSVWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DETECTIONS'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the detections to a CSV file.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DETECTIONS</p></td>
+<td colspan="3"><p>Output of an object detection model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+<tr class="row-even"><td><p>START_FRAME</p></td>
+<td colspan="3"><p>Initial frame index.</p></td>
+</tr>
+<tr class="row-odd"><td><p>IMG_FILENAME (*)</p></td>
+<td colspan="3"><p>Image filename (for image sequences)</p></td>
+</tr>
+</tbody>
+</table>
+<p>(*) Optional.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – CSV output file.</p></li>
+<li><p><strong>show_label</strong> (<em>bool</em>) – display class name in bounding box.</p></li>
+<li><p><strong>context_name</strong> (<em>str</em>) – name of the variable in the context containing detections.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.DetectionsCSVWriter.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_detection.</span></span><span class="sig-name descname"><span class="pre">ObjectDetectorCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DETECTIONS'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV" title="Permalink to this definition">¶</a></dt>
+<dd><p>This components reads precomputed detections from a CSV file.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>START_FRAME</p></td>
+<td colspan="3"><p>Initial frame index.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>WRITES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DETECTIONS</p></td>
+<td colspan="3"><p>Output of an object detection model.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>class_names_filename</strong> (<em>str</em>) – text file with class names.</p></li>
+<li><p><strong>show_label</strong> (<em>bool</em>) – display class name in bounding box.</p></li>
+<li><p><strong>context_name</strong> (<em>str</em>) – name of the variable in the context containing detections.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.ObjectDetectorCSV.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="utilities">
-<h3>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-videoanalytics.pipeline.sinks.object_detection.yolo4">
+<span id="yolov4-implementation-in-tensorflow"></span><h3>YOLOv4 implementation in tensorflow<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.object_detection.yolo4" title="Permalink to this headline">¶</a></h3>
+<p>This module contains a YOLOv4 object detector tensorflow implementation.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_detection.yolo4.</span></span><span class="sig-name descname"><span class="pre">YOLOv4DetectorTF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_input_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">416</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_max_output_size_per_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_max_total_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yolo_score_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DETECTIONS'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF" title="Permalink to this definition">¶</a></dt>
+<dd><p>YOLOv4 object detector tensorflow implementation.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>FRAME</p></td>
+<td colspan="3"><p>Numpy array representing the frame.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>UPDATES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DETECTIONS</p></td>
+<td colspan="3"><p>List holding numpy array with bounding boxes.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>weights_filename</strong> (<em>str</em>) – model weights filename.</p></li>
+<li><p><strong>allowed_classes</strong> (<em>list</em>) – set of allowed classes. This option is to restrict
+the detections to a subset of classes relevant to
+the application domain. If None, all classes are allowed.</p></li>
+<li><p><strong>yolo_input_size</strong> (<em>int</em>) – size in pixels of the input cell. The input image is
+resized using opencv.</p></li>
+<li><p><strong>yolo_max_output_size_per_class</strong> (<em>int</em>) – maximum number of detections per class.</p></li>
+<li><p><strong>yolo_max_total_size</strong> (<em>int</em>) – maximum number of detections.</p></li>
+<li><p><strong>yolo_iou_threshold</strong> (<em>float</em>) – minimum IoU to accept detection.</p></li>
+<li><p><strong>yolo_score_threshold</strong> (<em>float</em>) – minimum score to accept detected class as valid.</p></li>
+<li><p><strong>context_name</strong> (<em>str</em>) – variable name used for storing detections in context</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.yolo4.YOLOv4DetectorTF.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="detection-performance-evaluation">
-<h3>Detection performance evaluation<a class="headerlink" href="#detection-performance-evaluation" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="module-videoanalytics.pipeline.sinks.object_detection.utils">
+<span id="utilities"></span><h3>Utilities<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.object_detection.utils" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.utils.convert_detections">
+<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_detection.utils.</span></span><span class="sig-name descname"><span class="pre">convert_detections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xyxy'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.utils.convert_detections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a dataframe in YOLO normalized format to absolute coordinates (x0,y0,x1,y1)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>pandas.DataFrame</em>) – input dataframe with columns x,y,w,h.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Rerturns:</dt><dd><p>A dataframe with columns x0,y0,x1,y1.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list">
+<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_detection.utils.</span></span><span class="sig-name descname"><span class="pre">load_detections_from_file_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xyxy'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of files, constructs a dataframe with the bounding boxes for each image.
+The list of files is typically obtained from the test directory text annotations
+(YOLO normalized format is assumed).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>det_list</strong> (<em>list</em>) – list of filenames.</p></li>
+<li><p><strong>box_format</strong> (<em>str</em>) – Currently only “xyxy” is supported.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe (see format below).</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>The returned dataframe contains the following columns:</dt><dd><ul class="simple">
+<li><p>filename: name of the file.</p></li>
+<li><p>frame_num: set to the index of the file in the list (this field is reserved for videos).</p></li>
+<li><p>class_idx: class index.</p></li>
+<li><p>x,y: bounding box center coordinates (normalized)</p></li>
+<li><p>w,h: bounding box dimensions (normalized).</p></li>
+<li><p>img_w,img_h: image width and height in pixels.</p></li>
+</ul>
+</dd>
+<dt>If the box_format is ‘xyxy’ then the following columns will be transformed/added:</dt><dd><ul class="simple">
+<li><p>x,y,w,h: will be transformed to pixels</p></li>
+<li><p>x0,y0,x1,y1: will be set to the bounding box top-left, bottom-right coordinates in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.utils.plot_predictions_vs_ground_truth">
+<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_detection.utils.</span></span><span class="sig-name descname"><span class="pre">plot_predictions_vs_ground_truth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_gt_dets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_pred_dets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.utils.plot_predictions_vs_ground_truth" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Given an image and class id present in two dataframes containing bounding boxes</dt><dd><p>for a set of images in x0,y0,x1,y1 format, plot the bounding boxes corresponding to the
+ground truth and predictions.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_gt_dets</strong> (<em>pandas.DataFrame</em>) – ground truth detections as returned by
+<a class="reference internal" href="#videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list" title="videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list()</span></code></a>.</p></li>
+<li><p><strong>df_pred_dets</strong> (<em>pandas.DataFrame</em>) – predictions.</p></li>
+<li><p><strong>img_path</strong> (<em>str</em>) – path of the parent directory containing the input images.</p></li>
+<li><p><strong>img_name</strong> (<em>str</em>) – name of the image.</p></li>
+<li><p><strong>class_idx</strong> (<em>int</em>) – class index to plot (only one class is supported).</p></li>
+<li><p><strong>ax</strong> (<em>Axes</em>) – matplotlib axes instance.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-videoanalytics.pipeline.sinks.object_detection.evaluation">
+<span id="detection-performance-evaluation"></span><h3>Detection performance evaluation<a class="headerlink" href="#module-videoanalytics.pipeline.sinks.object_detection.evaluation" title="Permalink to this headline">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.object_detection.evaluation.evaluate_object_detection_predictions">
+<span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.object_detection.evaluation.</span></span><span class="sig-name descname"><span class="pre">evaluate_object_detection_predictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_gt_dets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_pred_dets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.object_detection.evaluation.evaluate_object_detection_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the predictions returned by an object detection model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_gt_dets</strong> (<em>pandas.DataFrame</em>) – ground truth detections as returned by
+<a class="reference internal" href="#videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list" title="videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">videoanalytics.pipeline.sinks.object_detection.utils.load_detections_from_file_list()</span></code></a>.</p></li>
+<li><p><strong>df_pred_dets</strong> (<em>pandas.DataFrame</em>) – predictions.</p></li>
+<li><p><strong>classes</strong> (<em>list</em>) – list of class indexes to evaluate.</p></li>
+<li><p><strong>model_name</strong> (<em>str</em>) – model name to use in the returned dataframe.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>A dataframe containing the results.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </div>
 </div>

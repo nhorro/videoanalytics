@@ -112,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Object%20detection.html">Object detection pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Object%20tracking.html">Object tracking pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Integration%20with%20databases.html">Integration with databases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Events%20and%20statistics%20from%20ROIs.html">Events and statistics from ROIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References and useful resources</a></li>
 </ul>
 
@@ -263,6 +264,165 @@ performed.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
+<span class="target" id="module-videoanalytics.pipeline.sinks.roi"></span><p>This module contains components for loading and processing of polygonal regions of interest (ROIs).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.roi.ROIPresenceCounter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.roi.</span></span><span class="sig-name descname"><span class="pre">ROIPresenceCounter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DETECTIONS'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.roi.ROIPresenceCounter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Component for testing the presence of detected objects in ROIs.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>START_FRAME</p></td>
+<td colspan="3"><p>Initial frame index.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>WRITES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>q_{name}</p></td>
+<td colspan="3"><p>Number of objects inside region {name}.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – name of JSON file containing region definitions.</p></li>
+<li><p><strong>context_name</strong> (<em>str</em>) – name of the variable in the context containing the detections.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>(*) The entry contains a list of dictionaries containing:</dt><dd><ul class="simple">
+<li><p>polygon: numpy array containing polygon definition</p></li>
+<li><p>color: color to represent the polygon in the video.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.roi.ROIPresenceCounter.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.roi.ROIPresenceCounter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.roi.ROIPresenceCounter.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.roi.ROIPresenceCounter.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.roi.ROIPresenceCounter.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.roi.ROIPresenceCounter.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.roi.ROIView">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">videoanalytics.pipeline.sinks.roi.</span></span><span class="sig-name descname"><span class="pre">ROIView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.roi.ROIView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Component for visualization of ROIs on frame.</p>
+<p>This component <strong>READS</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>START_FRAME</p></td>
+<td colspan="3"><p>Initial frame index.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This component <strong>WRITES</strong> the following entries in the global context:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable name</p></th>
+<th class="head" colspan="3"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>regions(*)</p></td>
+<td colspan="3"><p>Region definitions.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the component unique name.</p></li>
+<li><p><strong>context</strong> (<em>dict</em>) – The global context.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – name of JSON file containing region definitions.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – transparency factor (0=invisible,1=opaque).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>(*) The entry contains a list of dicitonaries with following elements:</dt><dd><ul class="simple">
+<li><p>polygon: numpy array containing polygon definition</p></li>
+<li><p>color: color to represent the polygon in the video.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.roi.ROIView.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.roi.ROIView.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called for each active component in the pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.roi.ROIView.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.roi.ROIView.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after all components from the pipeline are instanced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="videoanalytics.pipeline.sinks.roi.ROIView.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#videoanalytics.pipeline.sinks.roi.ROIView.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called after the process finished.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 </div>
