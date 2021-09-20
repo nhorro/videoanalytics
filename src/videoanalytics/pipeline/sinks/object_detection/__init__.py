@@ -214,8 +214,8 @@ class ObjectDetectorCSV(Sink):
         show_label (bool): display class name in bounding box.
         context_name(str): name of the variable in the context containing detections.
     '''   
-    def __init__(self, context,filename, context_name="DETECTIONS"):
-        super().__init__(context)
+    def __init__(self, name, context,filename, context_name="DETECTIONS"):
+        super().__init__(name, context)
         
         det_columns = ["frame_num","class_idx", "x","y","w","h","score","filename"]        
         self.df = pd.read_csv(filename,names=det_columns)
