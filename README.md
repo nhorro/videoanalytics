@@ -5,6 +5,10 @@
 
 Python library for fast prototyping [video content analysis](https://en.wikipedia.org/wiki/Video_content_analysis) applications. Relies on OpenCV, Keras, and other standard computer vision and machine learning python packages.
 
+An example application:
+
+[![Videoanalytics for fisheries](https://img.youtube.com/vi/PYpvPIocYGc/0.jpg)](https://www.youtube.com/watch?v=PYpvPIocYGc)
+
 ## Functionality and available components
 
 Typical functional blocks of a video analytics application are described in [2]. Some  examples are:
