@@ -27,6 +27,7 @@ Specific blocks that might require a more detailed discussion are treated in spe
    background
    database
    zeromq
+   rtsppub
    utils
    Basic pipeline.ipynb
    Image transformations.ipynb
