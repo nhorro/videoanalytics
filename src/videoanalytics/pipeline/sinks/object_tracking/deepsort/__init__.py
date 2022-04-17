@@ -49,9 +49,8 @@ class DeepSORT(Sink):
         context (dict): The global context. 
         model_filename(str): filename for the reidentification model.
     '''
-    def __init__(self, name, context, model_filename,
-                    max_cosine_distance=0.4,nn_budget=None,
-                    max_iou_distance=0.7, max_age=60, n_init=3):
+    def __init__(self, name, context, model_filename, max_cosine_distance= 0.4, 
+                 nn_budget= None, max_iou_distance= 0.7, max_age= 60, n_init= 3):
         super().__init__(name, context)
         self.relative_frame_counter = 0            
 
@@ -63,7 +62,7 @@ class DeepSORT(Sink):
         # calculate cosine distance metric
         self.metric = NearestNeighborDistanceMetric("cosine", self.max_cosine_distance, self.nn_budget)
         # initialize tracker
-        self.mot_tracker = Tracker(self.metric, max_iou_distance, max_age, n_init)
+        self.mot_tracker = Tracker(self.metric, max_iou_distance, max_age, n_init )
 
         
     def setup(self):                        

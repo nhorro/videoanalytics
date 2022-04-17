@@ -134,8 +134,9 @@ class DetectionsCounter(Sink):
             #x,y,w,h = out_boxes[i]            
             score = out_scores[i]
             class_idx = int(out_classes[i])   
-            varname="{}{:02d}{}".format(self.prefix,class_idx,self.postfix)
-            self.context[varname]+=1
+            if class_idx in self.classes_to_count:
+                varname="{}{:02d}{}".format(self.prefix,class_idx,self.postfix)
+                self.context[varname]+=1
     
     def shutdown(self):
         pass

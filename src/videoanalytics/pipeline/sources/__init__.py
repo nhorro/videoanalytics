@@ -95,7 +95,6 @@ class VideoReader(Source):
         ret = False        
         if self.processed_frames < self.total_frames:
             ret, frame = self.cap.read()
-            
             if ret:
                 self.context['FRAME'] = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 self.processed_frames+=1

@@ -58,7 +58,7 @@ class VideoWriter(Sink):
     def setup(self):
         pass
     
-    def process(self):    
+    def process(self):     
         converted = cv2.cvtColor(self.context["FRAME"], cv2.COLOR_RGB2BGR)        
         self.out.write( converted )
     
@@ -154,3 +154,39 @@ class VariableCSVWriter(Sink):
 
     def shutdown(self):        
         self.csv_file.close()            
+
+
+
+class OpenCVView(Sink):
+    '''
+    Display current frame (requires desktop).
+
+    This component **READS** the following entries:
+
+    +-------------------+-----------------------------------------------------+
+    | Variable name     | Description                                         |
+    +===================+============+==========+=============================+
+    | FRAME             | Current frame.                                      |
+    +-------------------+-----------------------------------------------------+
+
+    Args:        
+        name(str): the component unique name.
+        context (dict): The global context. 
+    '''
+    def __init__(self, name, context):
+        super().__init__(name, context)
+
+    def setup(self):           
+        cv2.namedWindow( "Video", cv2.WINDOW_NORMAL | cv2.WINDOW_FREERATIO);     
+        cv2.moveWindow("Video", 150,210);
+        cv2.resizeWindow('Video', 1800,1400)
+
+        self.frame_counter = self.context["START_FRAME"]
+
+    def process(self):        
+        converted = cv2.cvtColor(self.context["FRAME"], cv2.COLOR_RGB2BGR)     
+        cv2.imshow("Video",converted)      
+        self.frame_counter+=1
+
+    def shutdown(self):        
+        pass

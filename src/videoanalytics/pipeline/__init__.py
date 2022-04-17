@@ -10,11 +10,12 @@ import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout
 import matplotlib.pyplot as plt
 import time
+import cv2
 
 # FIXME
 import sys
 if 'ipykernel' in sys.modules:
-    from tqdm import tqdm_notebook as tqdm
+    from tqdm.notebook import tqdm
 else:
     from tqdm import tqdm
 
@@ -112,7 +113,7 @@ class Pipeline:
 
     logger = logging.getLogger(__name__)
 
-    def __init__(self):
+    def __init__(self,interactive=False):
         self.dag = nx.DiGraph()
         self.optimized = False
         self.metrics = {}
@@ -120,6 +121,7 @@ class Pipeline:
         self.abs_t0 = 0
         self.abs_t1 = 0
         self.total_elapsed_time = 0
+        self.interactive = interactive
 
     def add_component(self,component):
         self.dag.add_node( component.name, component=component )
@@ -185,6 +187,10 @@ class Pipeline:
             progress_bar.update(curr_progress-last_progress)            
             last_progress = curr_progress
             i+=1
+
+            if self.interactive:
+                if cv2.waitKey(1) == ord('q'):
+                    eof_not_reached = False
             
         self.abs_t1 = time.perf_counter()        
         self.total_elapsed_time = self.abs_t1 - self.abs_t0

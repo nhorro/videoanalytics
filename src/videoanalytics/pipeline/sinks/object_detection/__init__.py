@@ -111,7 +111,7 @@ class DetectionsAnnotator(Sink):
             bbox_color = self.colors[class_ind]
             bbox_thick = int(0.6 * (image_h + image_w) / 600)
             c1, c2 = (x, y), (x + w, y + h)
-            cv2.rectangle(self.context["FRAME"], c1, c2, bbox_color, bbox_thick)
+            cv2.rectangle(self.context["FRAME"], (int(x),int(y)), (int(x + w),int(y+h)), bbox_color, bbox_thick)
             
             #print("Object found: {}, Confidence: {:.2f}, BBox Coords (xmin, ymin, width, height): {}, {}, {}, {} ".format(class_name, score, x, y, w, h))
 
@@ -119,8 +119,8 @@ class DetectionsAnnotator(Sink):
                 bbox_mess = '%s: %.2f' % (class_name, score)
                 t_size = cv2.getTextSize(bbox_mess, 0, fontScale, thickness=bbox_thick // 2)[0]
                 c3 = (c1[0] + t_size[0], c1[1] - t_size[1] - 3)
-                cv2.rectangle(self.context["FRAME"], c1, (np.float32(c3[0]), np.float32(c3[1])), bbox_color, -1) #filled
-                cv2.putText(self.context["FRAME"], bbox_mess, (c1[0], np.float32(c1[1] - 2)), cv2.FONT_HERSHEY_SIMPLEX,
+                cv2.rectangle(self.context["FRAME"], (int(x),int(y)), (int(c3[0]), int(c3[1])), bbox_color, -1) #filled
+                cv2.putText(self.context["FRAME"], bbox_mess, (int(c1[0]), int(c1[1] - 2)), cv2.FONT_HERSHEY_SIMPLEX,
                             fontScale, (0, 0, 0), bbox_thick // 2, lineType=cv2.LINE_AA)
             
             self.frame_counter+=1     
