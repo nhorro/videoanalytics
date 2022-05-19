@@ -35,12 +35,17 @@ class TextOverlay(Sink):
         name(str): the component unique name.
         context (dict): The global context. 
         text (str): text to display.
+        x (int): horizontal position in pixels.
+        y (int): vertical position in pixels.
+        font_size (int): font size (FIXME: OpenCV units?)
     
     '''   
-    def __init__(self, name, context,text,x,y):
+    def __init__(self, name, context,text,x,y,font_scale=1,font_weight=2):
         super().__init__(name, context)
         self.x=x
         self.y=y
+        self.font_weight = font_weight
+        self.font_scale = font_scale
         self.text=text
    
     def setup(self):        
@@ -53,7 +58,7 @@ class TextOverlay(Sink):
             y = self.y + i*dy
             self.context["FRAME"] =  cv2.putText(
                 self.context["FRAME"], 
-                line, (self.x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+                line, (self.x,y), cv2.FONT_HERSHEY_SIMPLEX, self.font_scale, (255,255,255), self.font_weight)
     
     def shutdown(self):
         pass   

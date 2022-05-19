@@ -1,0 +1,23 @@
+FROM tensorflow/tensorflow:latest-gpu-jupyter
+
+# Requirements for some python pagckages such as OpenCV, Graphviz, etc.
+RUN apt-get update && apt-get -y install \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    graphviz graphviz-dev \
+    libcairo2-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*  
+
+# Requirements for videoanalytics
+ADD requirements.txt /tmp/requirements.txt
+RUN python3 -m pip --no-cache-dir install --upgrade \
+    -r /tmp/requirements.txt
+
+RUN apt-get autoremove 
+
+WORKDIR /applications
+
+# By default, run jupyter
+CMD ["bash", "-c", "source /etc/bash.bashrc && jupyter notebook --notebook-dir=/applications --ip 0.0.0.0 --no-browser --allow-root"]

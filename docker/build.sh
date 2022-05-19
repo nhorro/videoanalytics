@@ -1,0 +1,1 @@
+docker build -t nhorro/videoanalytics-gpu:latest -f Dockerfile.gpu ../
