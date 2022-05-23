@@ -10,6 +10,32 @@ RUN apt-get update && apt-get -y install \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*  
 
+#Build ffmpeg with CUDA support from source
+# RUN git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git && \
+#     cd nv-codec-headers && make install \
+#     && cd - && rm -rf nv-codec-headers
+
+# RUN apt-get update && apt-get install -y 
+
+# RUN git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg && \
+#     cd ffmpeg && \
+#     ./configure --enable-nonfree \
+#                 --enable-gpl \
+#                 --enable-cuda-nvcc \
+#                 --enable-libnpp \
+#                 --extra-cflags=-I/usr/local/cuda/include \
+#                 --extra-ldflags=-L/usr/local/cuda/lib64 \
+#                 --disable-static \
+#                 --enable-shared \
+#                 --enable-libopenjpeg \
+#                 --enable-libx265 \
+#                 --enable-libx264 \
+#                 --enable-nvenc \
+#                 --enable-libxvid \
+#     && make -j 8 \
+#     && make install \
+#     && cd - && rm -rf ffmpeg
+
 # Requirements for videoanalytics
 ADD requirements.txt /tmp/requirements.txt
 RUN python3 -m pip --no-cache-dir install --upgrade \
